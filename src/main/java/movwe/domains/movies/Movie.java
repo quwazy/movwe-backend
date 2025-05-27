@@ -12,4 +12,5 @@ public class Movie implements Serializable {
     @Id
     private Long id;
     private String title;
+    private String description;
 }
