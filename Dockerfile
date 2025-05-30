@@ -29,9 +29,20 @@ RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -Dmaven.test.skip -f
 
 # Ovo je drugi stage gde dobijamo rezultirajuci image.
 # Ovde kopiramo .jar fajl napravljen u prethodnom, tj. prvom stage-u.
-FROM openjdk:25
+#FROM openjdk:25
+#
+#COPY --from=builder /usr/app/target/movwe-0.0.1.jar /movwe-0.0.1.jar
+#
+#EXPOSE 8080
+#ENTRYPOINT ["java", "-jar", "/movwe-0.0.1.jar"]
+
+# Final stage
+FROM alpine:latest
+
+RUN apk add --no-cache openjdk21-jre
 
 COPY --from=builder /usr/app/target/movwe-0.0.1.jar /movwe-0.0.1.jar
 
 EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "/movwe-0.0.1.jar"]
