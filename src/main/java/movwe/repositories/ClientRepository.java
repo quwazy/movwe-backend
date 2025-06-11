@@ -1,6 +1,6 @@
 package movwe.repositories;
 
-import movwe.domains.clients.Client;
+import movwe.domains.clients.entities.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

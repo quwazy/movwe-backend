@@ -1,6 +1,6 @@
 package movwe.domains.employees.mappers;
 
-import movwe.domains.employees.Employee;
+import movwe.domains.employees.entities.Employee;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.domains.employees.dtos.EmployeeDto;
 import org.mapstruct.Mapper;

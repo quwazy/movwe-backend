@@ -1,7 +1,7 @@
 package movwe.configs;
 
 import lombok.AllArgsConstructor;
-import movwe.domains.clients.Client;
+import movwe.domains.clients.entities.Client;
 import movwe.repositories.ClientRepository;
 import movwe.repositories.EmployeeRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -15,6 +15,7 @@ public class DataConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        /// ovde popuni sifrarnike na kraju
         if (clientRepository.count() == 0) {
             Client client = new Client();
             client.setEmail("jane@gmail.com");

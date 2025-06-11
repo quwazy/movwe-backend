@@ -1,4 +1,4 @@
-package movwe.domains.employees;
+package movwe.domains.clients.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -13,8 +13,8 @@ import movwe.domains.users.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "employees")
-public class Employee extends User {
-    private String firstName;
-    private String lastName;
+@Table(name = "clients")
+public class Client extends User {
+    private String username;
+    private String address;
 }

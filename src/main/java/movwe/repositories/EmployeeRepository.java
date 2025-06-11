@@ -1,6 +1,6 @@
 package movwe.repositories;
 
-import movwe.domains.employees.Employee;
+import movwe.domains.employees.entities.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

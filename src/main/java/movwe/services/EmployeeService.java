@@ -1,7 +1,7 @@
 package movwe.services;
 
 import lombok.AllArgsConstructor;
-import movwe.domains.employees.Employee;
+import movwe.domains.employees.entities.Employee;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.domains.employees.dtos.EmployeeDto;
 import movwe.domains.employees.mappers.EmployeeMapper;

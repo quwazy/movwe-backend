@@ -1,4 +1,4 @@
-package movwe.domains.movies;
+package movwe.domains.movies.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
