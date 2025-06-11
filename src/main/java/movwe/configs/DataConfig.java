@@ -16,12 +16,12 @@ public class DataConfig implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         /// ovde popuni sifrarnike na kraju
-        if (clientRepository.count() == 0) {
-            Client client = new Client();
-            client.setEmail("jane@gmail.com");
-            client.setUsername("klijent");
-            client.setAddress("jasenicka");
-            clientRepository.saveAndFlush(client);
-        }
+//        if (clientRepository.count() == 0) {
+//            Client client = new Client();
+//            client.setEmail("jane@gmail.com");
+//            client.setUsername("klijent");
+//            client.setAddress("jasenicka");
+//            clientRepository.saveAndFlush(client);
+//        }
     }
 }

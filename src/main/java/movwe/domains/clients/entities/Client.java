@@ -22,7 +22,7 @@ public class Client extends User {
     @Column(unique = true)
     private String username;
 
-    @OneToMany(mappedBy = "clientId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Movie> movies = new HashSet<>();
 
     @ManyToMany

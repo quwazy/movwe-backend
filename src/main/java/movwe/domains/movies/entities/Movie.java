@@ -3,6 +3,8 @@ package movwe.domains.movies.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import movwe.domains.clients.entities.Client;
+import movwe.domains.movies.enums.Genre;
 import movwe.domains.movies.enums.Type;
 
 import java.io.Serializable;
@@ -12,9 +14,12 @@ import java.io.Serializable;
 @Table(name = "movies")
 public class Movie implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long clientId;
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 
     private String title;
 
@@ -30,5 +35,5 @@ public class Movie implements Serializable {
     private Type type;
 
     @Enumerated(EnumType.STRING)
-    private Type genre;
+    private Genre genre;
 }
