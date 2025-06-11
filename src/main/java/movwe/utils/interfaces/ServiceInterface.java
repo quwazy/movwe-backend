@@ -2,19 +2,19 @@ package movwe.utils.interfaces;
 
 import java.util.List;
 
-public interface ServiceInterface<T> {
+public interface ServiceInterface {
     /**
      * Get one entity by its id
      * @param id of entity
      * @return T as Object
      */
-    T get(Long id);
+    DtoInterface get(Long id);
 
     /**
      * Get all entities in database table
      * @return T as List of Objects
      */
-    List<T> getAll();
+    List<?> getAll();
 
     /**
      * Insert entity into database table

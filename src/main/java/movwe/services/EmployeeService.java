@@ -3,38 +3,37 @@ package movwe.services;
 import lombok.AllArgsConstructor;
 import movwe.domains.employees.Employee;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
+import movwe.domains.employees.dtos.EmployeeDto;
+import movwe.domains.employees.mappers.EmployeeMapper;
 import movwe.repositories.EmployeeRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class EmployeeService implements ServiceInterface<Employee> {
+public class EmployeeService implements ServiceInterface {
     private EmployeeRepository employeeRepository;
 
     @Override
-    public Employee get(Long id) {
-        return employeeRepository.findById(id).orElse(null);
+    public EmployeeDto get(Long id) {
+        return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.findById(id).orElse(null));
     }
 
     @Override
-    public List<Employee> getAll() {
-        return new ArrayList<>(employeeRepository.findAll());
+    public List<EmployeeDto> getAll() {
+        return employeeRepository.findAll()
+                .stream()
+                .map(EmployeeMapper.INSTANCE::fromEmployeeToDto)
+                .toList();
     }
 
     @Override
     public boolean add(DtoInterface dto) {
-        if (dto instanceof CreateEmployeeDto) {
-            CreateEmployeeDto createEmployeeDto = (CreateEmployeeDto) dto;
-            Employee employee =  new Employee();
-            employee.setEmail(createEmployeeDto.getEmail());
-            employee.setPassword(createEmployeeDto.getPassword());
-            employee.setFirstName(createEmployeeDto.getFirstName());
-            employee.setLastName(createEmployeeDto.getLastName());
+        if (dto instanceof CreateEmployeeDto createEmployeeDto) {
+            Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
 
             employeeRepository.save(employee);
             return true;
