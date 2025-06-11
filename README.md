@@ -20,11 +20,13 @@ This repository contains the **backend** developed with **Spring Boot**.
 
 ## ⚙️ Tech Stack
 
-- Java 17
+- Java 21
 - Spring Boot 3.x
 - Spring Security + JWT
 - Spring Data JPA (Hibernate)
 - PostgreSQL
+- MongoDB
+- Docker
 - RESTful API design
 
 ---
@@ -35,7 +37,7 @@ This repository contains the **backend** developed with **Spring Boot**.
 
 - Java 17+
 - Maven
-- PostgreSQL running locally or via Docker
+- PostgreSQL & MongoDB running locally or via Docker
 
 ### 🔧 Configuration
 
