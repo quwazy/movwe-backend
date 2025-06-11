@@ -1,5 +1,6 @@
 package movwe.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.services.EmployeeService;
@@ -13,6 +14,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping(path = "/get/{id}")
+    @Operation(summary = "Get employee by id")
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
         try {
             if (id == null) {
@@ -28,6 +30,7 @@ public class EmployeeController {
     }
 
     @GetMapping(path = "/getAll")
+    @Operation(summary = "Get all employees")
     public ResponseEntity<?> getAllEmployees() {
         try {
             return ResponseEntity.ok(employeeService.getAll());
@@ -37,6 +40,7 @@ public class EmployeeController {
     }
 
     @PostMapping(path = "/add")
+    @Operation(summary = "Add new employee")
     public ResponseEntity<?> addEmployee(@RequestBody CreateEmployeeDto createEmployeeDto) {
         try {
             if (employeeService.add(createEmployeeDto)){
@@ -49,6 +53,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(path = "/delete/{id}")
+    @Operation(summary = "Delete employee by id")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
         try {
             if (employeeService.delete(id)) {
@@ -63,6 +68,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(path = "/deleteAll")
+    @Operation(summary = "Delete all employees in table")
     public ResponseEntity<?> deleteAllEmployees() {
         try {
             if (employeeService.deleteAll()) {

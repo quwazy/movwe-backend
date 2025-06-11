@@ -1,5 +1,6 @@
 package movwe.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.CreateClientDto;
 import movwe.services.ClientService;
@@ -13,6 +14,7 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping(path = "/get/{id}")
+    @Operation(summary = "Get client by id")
     public ResponseEntity<?> getClient(@PathVariable Long id) {
         try {
             if (id == null){
@@ -28,6 +30,7 @@ public class ClientController {
     }
 
     @GetMapping(path = "/getAll")
+    @Operation(summary = "Get all clients")
     public ResponseEntity<?> getAllClients() {
         try {
             return ResponseEntity.ok(clientService.getAll());
@@ -37,6 +40,7 @@ public class ClientController {
     }
 
     @PostMapping(path = "/add")
+    @Operation(summary = "Add new client")
     public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto){
         try {
             if (clientService.add(createClientDto)){
@@ -49,6 +53,7 @@ public class ClientController {
     }
 
     @DeleteMapping(path = "/delete/{id}")
+    @Operation(summary = "Delete client by id")
     public ResponseEntity<?> deleteClient(@PathVariable Long id) {
         try {
             if (clientService.delete(id)) {
@@ -63,6 +68,7 @@ public class ClientController {
     }
 
     @DeleteMapping(path = "/deleteAll")
+    @Operation(summary = "Delete all clients in table")
     public ResponseEntity<?> deleteAllClients() {
         try {
             if (clientService.deleteAll()) {

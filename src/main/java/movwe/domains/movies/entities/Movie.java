@@ -36,4 +36,11 @@ public class Movie implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private Genre genre;
+
+    private Long creationDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.creationDate = System.currentTimeMillis() / 1000L;
+    }
 }
