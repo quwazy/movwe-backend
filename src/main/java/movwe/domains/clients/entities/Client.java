@@ -36,5 +36,5 @@ public class Client extends User {
     @Embedded
     private Address address;
 
-    private boolean active;
+    private boolean active = true;
 }

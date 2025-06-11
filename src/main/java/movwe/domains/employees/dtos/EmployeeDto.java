@@ -14,4 +14,6 @@ public class EmployeeDto implements DtoInterface {
     private String lastName;
     @Schema(description = "Role of employee")
     private Role role;
+    @Schema(description = "Indicates if employee is active")
+    private boolean active;
 }

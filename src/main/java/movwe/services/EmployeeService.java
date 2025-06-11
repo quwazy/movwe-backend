@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import movwe.domains.employees.entities.Employee;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.domains.employees.dtos.EmployeeDto;
+import movwe.domains.employees.enums.Role;
 import movwe.domains.employees.mappers.EmployeeMapper;
 import movwe.repositories.EmployeeRepository;
 import movwe.utils.interfaces.DtoInterface;
@@ -34,6 +35,7 @@ public class EmployeeService implements ServiceInterface {
     public boolean add(DtoInterface dto) {
         if (dto instanceof CreateEmployeeDto createEmployeeDto) {
             Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
+            employee.setRole(Role.valueOf(createEmployeeDto.getRole()));
 
             employeeRepository.save(employee);
             return true;
@@ -57,7 +59,10 @@ public class EmployeeService implements ServiceInterface {
 
     @Override
     public boolean deleteAll() {
-        employeeRepository.deleteAll();
-        return true;
+        if (employeeRepository.count() != 0) {
+            employeeRepository.deleteAll();
+            return true;
+        }
+        return false;
     }
 }
