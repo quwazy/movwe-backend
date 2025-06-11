@@ -1,45 +1,45 @@
 package movwe.controllers;
 
 import lombok.AllArgsConstructor;
-import movwe.domains.employees.dtos.CreateEmployeeDto;
-import movwe.services.EmployeeService;
+import movwe.domains.clients.dtos.CreateClientDto;
+import movwe.services.ClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/employees")
-public class EmployeeController {
-    private final EmployeeService employeeService;
+@RequestMapping(path = "/clients")
+public class ClientController {
+    private final ClientService clientService;
 
     @GetMapping(path = "/get/{id}")
-    public ResponseEntity<?> getEmployee(@PathVariable Long id) {
+    public ResponseEntity<?> getClient(@PathVariable Long id) {
         try {
-            if (id == null) {
+            if (id == null){
                 return ResponseEntity.badRequest().build();
             }
-            if (employeeService.get(id) != null){
-                return ResponseEntity.ok(employeeService.get(id));
+            if (clientService.get(id) != null){
+                return ResponseEntity.ok(clientService.get(id));
             }
-            return ResponseEntity.badRequest().body("Employee with id " + id + " does not exist");
+            return ResponseEntity.badRequest().body("Client with id " + id + " does not exist");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping(path = "/getAll")
-    public ResponseEntity<?> getAllEmployees() {
+    public ResponseEntity<?> getAllClients() {
         try {
-            return ResponseEntity.ok(employeeService.getAll());
+            return ResponseEntity.ok(clientService.getAll());
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @PostMapping(path = "/add")
-    public ResponseEntity<?> addEmployee(@RequestBody CreateEmployeeDto createEmployeeDto) {
+    public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto){
         try {
-            if (employeeService.add(createEmployeeDto)){
+            if (clientService.add(createClientDto)){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
@@ -49,30 +49,30 @@ public class EmployeeController {
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<?> deleteClient(@PathVariable Long id) {
         try {
-            if (employeeService.delete(id)) {
+            if (clientService.delete(id)) {
                 return ResponseEntity.ok().build();
             }
             else {
                 return ResponseEntity.badRequest().build();
             }
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping(path = "/deleteAll")
-    public ResponseEntity<?> deleteAllEmployees() {
+    public ResponseEntity<?> deleteAllClients() {
         try {
-            if (employeeService.deleteAll()) {
+            if (clientService.deleteAll()) {
                 return ResponseEntity.ok().build();
             }
             else {
                 return ResponseEntity.badRequest().build();
             }
-        } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }
