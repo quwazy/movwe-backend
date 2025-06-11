@@ -16,6 +16,16 @@ public abstract class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(unique = true)
     private String email;
+
     private String password;
+
+    private Long creationDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.creationDate = System.currentTimeMillis() / 1000L;
+    }
 }

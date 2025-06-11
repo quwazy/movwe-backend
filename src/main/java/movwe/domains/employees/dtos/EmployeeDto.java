@@ -2,6 +2,7 @@ package movwe.domains.employees.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import movwe.domains.employees.enums.Role;
 import movwe.utils.interfaces.DtoInterface;
 
 @Data
@@ -11,4 +12,6 @@ public class EmployeeDto implements DtoInterface {
     private String email;
     private String firstName;
     private String lastName;
+    @Schema(description = "Role of employee")
+    private Role role;
 }
