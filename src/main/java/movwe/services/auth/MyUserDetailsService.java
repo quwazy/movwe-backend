@@ -3,6 +3,7 @@ package movwe.services.auth;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.entities.Client;
 import movwe.domains.employees.entities.Employee;
+import movwe.domains.mongos.LoginRequest;
 import movwe.repositories.ClientRepository;
 import movwe.repositories.EmployeeRepository;
 import org.springframework.security.core.userdetails.User;
@@ -21,6 +22,9 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail(email);
+
         try {
             Client client = clientRepository.findByEmail(email).orElse(null);
 
@@ -32,7 +36,6 @@ public class MyUserDetailsService implements UserDetailsService {
                         .build();
             } else {
                 Optional<Employee> employee = employeeRepository.findByEmail(email);
-                System.out.println("EMPLOYEE: " + employee);
                 if (employee.isPresent() && employee.get().isActive()) {
 
                     return User
