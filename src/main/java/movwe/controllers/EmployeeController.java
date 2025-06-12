@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.services.EmployeeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/employees")
+@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping(path = "/api/employees")
 public class EmployeeController {
     private final EmployeeService employeeService;
 

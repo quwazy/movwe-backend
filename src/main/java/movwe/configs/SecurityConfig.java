@@ -32,10 +32,11 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/*.html", "/css/**", "/js/**", "/images/**").permitAll()  //static HTML has no auth
-                        .requestMatchers("/swagger-ui/**").permitAll()  //swagger index.html
+                        .requestMatchers("/swagger-ui/**").permitAll()  //swagger
+                        .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers("/employees/**").authenticated()
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll() //block everything else unless explicitly allowed
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

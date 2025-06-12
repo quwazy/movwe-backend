@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/movies")
+@RequestMapping("/api/movies")
 public class MovieController {
     private final MovieService movieService;
 

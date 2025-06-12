@@ -32,8 +32,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String token = null;
         String email = null;
 
-        System.out.println("FROM FILTER");
-        if (!request.getRequestURL().toString().contains("/auth/")){
+        if (request.getRequestURL().toString().contains("/api/")){
             if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
                 token = authHeader.substring(7);
                 try {

@@ -27,8 +27,19 @@ public class AuthController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Login employee")
     public ResponseEntity<?> loginEmployee(@RequestBody LoginDto loginDto) {
-        try{
-            System.out.println(loginDto.toString());
+        return getResponseEntity(loginDto);
+    }
+
+    @PostMapping(path = "/client",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Login client")
+    public ResponseEntity<?> loginClient(@RequestBody LoginDto loginDto) {
+        return getResponseEntity(loginDto);
+    }
+
+    private ResponseEntity<?> getResponseEntity(@RequestBody LoginDto loginDto) {
+        try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginDto.getEmail(),
                     loginDto.getPassword()));
