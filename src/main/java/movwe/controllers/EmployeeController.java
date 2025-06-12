@@ -1,6 +1,7 @@
 package movwe.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.services.EmployeeService;
@@ -41,7 +42,7 @@ public class EmployeeController {
 
     @PostMapping(path = "/add")
     @Operation(summary = "Add new employee")
-    public ResponseEntity<?> addEmployee(@RequestBody CreateEmployeeDto createEmployeeDto) {
+    public ResponseEntity<?> addEmployee(@Valid @RequestBody CreateEmployeeDto createEmployeeDto) {
         try {
             if (employeeService.add(createEmployeeDto)){
                 return ResponseEntity.ok().build();

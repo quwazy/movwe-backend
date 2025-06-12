@@ -23,5 +23,6 @@ public class Employee extends User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private boolean active = true;
 }

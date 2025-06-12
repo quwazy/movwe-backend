@@ -2,7 +2,7 @@ package movwe.domains.clients.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import movwe.domains.clients.embedded.Address;
+import movwe.domains.clients.entities.Address;
 import movwe.utils.interfaces.DtoInterface;
 
 @Data

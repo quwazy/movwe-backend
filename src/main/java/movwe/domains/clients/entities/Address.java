@@ -1,4 +1,4 @@
-package movwe.domains.clients.embedded;
+package movwe.domains.clients.entities;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import movwe.domains.clients.embedded.Address;
 import movwe.domains.movies.entities.Movie;
 import movwe.domains.users.User;
 
@@ -36,5 +35,6 @@ public class Client extends User {
     @Embedded
     private Address address;
 
+    @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private boolean active = true;
 }
