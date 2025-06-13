@@ -3,8 +3,8 @@ package movwe.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import movwe.domains.mongos.LoginRequest;
-import movwe.services.auth.JwtService;
-import movwe.services.mongos.LoginRequestService;
+import movwe.services.authServices.JwtService;
+import movwe.services.mongoServices.LoginRequestService;
 import movwe.utils.dtos.JwtDto;
 import movwe.utils.dtos.LoginDto;
 import org.springframework.http.MediaType;
@@ -41,11 +41,21 @@ public class AuthController {
         return getResponseEntity(loginDto, "/client");
     }
 
+    /**
+     * Function which checks if employee/client is authenticated and
+     * saves a login attempt in database
+     * @param loginDto email and password as dto
+     * @param route which URL called this method
+     * @return JWT if login is successful, or bad request if something is wrong
+     */
     private ResponseEntity<?> getResponseEntity(@RequestBody LoginDto loginDto, String route) {
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail(loginDto.getEmail());
-        loginRequest.setPassword(loginDto.getPassword());
-        loginRequest.setRoute(route);
+        /// Login attempt
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email(loginDto.getEmail())
+                .password(loginDto.getPassword())
+                .route(route)
+                .build();
+
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginDto.getEmail(),

@@ -5,11 +5,10 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.services.EmployeeService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -18,7 +17,7 @@ import java.util.List;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    @GetMapping(path = "/get/{id}")
+    @GetMapping(path = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get employee by id")
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
         try {
@@ -34,7 +33,7 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping(path = "/getAll")
+    @GetMapping(path = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all employees")
     public ResponseEntity<?> getAllEmployees() {
         try {
@@ -44,7 +43,7 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping(path = "/add")
+    @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee")
     public ResponseEntity<?> addEmployee(@Valid @RequestBody CreateEmployeeDto createEmployeeDto) {
         try {

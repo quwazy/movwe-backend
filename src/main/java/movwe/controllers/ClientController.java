@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.CreateClientDto;
 import movwe.services.ClientService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
     private final ClientService clientService;
 
-    @GetMapping(path = "/get/{id}")
+    @GetMapping(path = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get client by id")
     public ResponseEntity<?> getClient(@PathVariable Long id) {
         try {
@@ -29,7 +30,7 @@ public class ClientController {
         }
     }
 
-    @GetMapping(path = "/getAll")
+    @GetMapping(path = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all clients")
     public ResponseEntity<?> getAllClients() {
         try {
@@ -39,7 +40,7 @@ public class ClientController {
         }
     }
 
-    @PostMapping(path = "/add")
+    @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new client")
     public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto){
         try {

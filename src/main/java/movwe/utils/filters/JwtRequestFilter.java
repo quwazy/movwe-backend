@@ -1,12 +1,13 @@
 package movwe.utils.filters;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import movwe.services.auth.JwtService;
-import movwe.services.auth.MyUserDetailsService;
+import movwe.services.authServices.JwtService;
+import movwe.services.authServices.MyUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,18 +23,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private MyUserDetailsService myUserDetailsService;
 
-    private final String AUTHORIZATION_HEADER = "Authorization";
-    private final String TOKEN_PREFIX = "Bearer ";
-
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String authHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
 
         if (request.getRequestURL().toString().contains("/api/")){
-            if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
                 try {
                     email = jwtService.extractEmail(token);
@@ -44,8 +41,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
+                    else {
+                        logger.warn("JWT token is invalid");
+                        SecurityContextHolder.clearContext();
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
+                    }
                 } catch (IllegalArgumentException e) {
                     throw new RuntimeException(e);
+                } catch (TokenExpiredException e) {
+//                    logger.warn("JWT token is expired");
                 }
             } else {
                 logger.warn("JWT token is missing in request header");
