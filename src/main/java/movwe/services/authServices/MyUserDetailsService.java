@@ -1,4 +1,4 @@
-package movwe.services.auth;
+package movwe.services.authServices;
 
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.entities.Client;

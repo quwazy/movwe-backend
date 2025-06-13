@@ -1,4 +1,4 @@
-package movwe.repositories.mongos;
+package movwe.repositories.mongoRepositories;
 
 import movwe.domains.mongos.LoginRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -1,8 +1,8 @@
-package movwe.services.mongos;
+package movwe.services.mongoServices;
 
 import lombok.AllArgsConstructor;
 import movwe.domains.mongos.LoginRequest;
-import movwe.repositories.mongos.LoginRequestRepository;
+import movwe.repositories.mongoRepositories.LoginRequestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

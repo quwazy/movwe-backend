@@ -1,4 +1,4 @@
-package movwe.services.auth;
+package movwe.services.authServices;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -36,8 +36,7 @@ public class JwtService implements Serializable {
         return (email.equals(extractEmail(token)) && !isTokenExpired(token));
     }
 
-    private DecodedJWT decodedToken(String token){
-        Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
-        return JWT.require(algorithm).build().verify(token);
+    private DecodedJWT decodedToken(String token) {
+        return JWT.require(Algorithm.HMAC256(SECRET_KEY)).build().verify(token);
     }
 }
