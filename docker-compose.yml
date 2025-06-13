@@ -27,6 +27,12 @@ services:
 #    networks:
 #      - movwe-network
 
+  redis:
+    image: redis:8.0-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
   backend:
     build:
       context: ./
@@ -49,5 +55,6 @@ services:
 volumes:
   postgres-data:
 #      mongo-data:
+
 networks:
   movwe-network:

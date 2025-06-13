@@ -9,6 +9,7 @@ import movwe.domains.employees.mappers.EmployeeMapper;
 import movwe.repositories.EmployeeRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class EmployeeService implements ServiceInterface {
     }
 
     @Override
+    @Cacheable(value = "employees")
     public List<EmployeeDto> getAll() {
         return employeeRepository.findAll()
                 .stream()
