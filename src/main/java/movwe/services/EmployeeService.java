@@ -10,15 +10,17 @@ import movwe.repositories.EmployeeRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class EmployeeService implements ServiceInterface<Employee> {
+public class EmployeeService implements ServiceInterface {
     private EmployeeRepository employeeRepository;
 
     @Override
@@ -37,18 +39,19 @@ public class EmployeeService implements ServiceInterface<Employee> {
     }
 
     @Override
-    public Employee add(DtoInterface dto) {
-        if (dto instanceof CreateEmployeeDto createEmployeeDto) {
+    @CacheEvict(value = "employees", allEntries = true)
+    @CachePut(value = "employee", key = "#result.id", condition = "#result != null")
+    public DtoInterface add(DtoInterface dto) {
+        if (dto instanceof CreateEmployeeDto createEmployeeDto && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
             Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
             employee.setRole(Role.valueOf(createEmployeeDto.getRole()));
-
-            return employeeRepository.save(employee);
+            return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.save(employee));
         }
         return null;
     }
 
     @Override
-    public Employee update(Long id, DtoInterface dto) {
+    public DtoInterface update(Long id, DtoInterface dto) {
         return null;
     }
 
@@ -62,7 +65,11 @@ public class EmployeeService implements ServiceInterface<Employee> {
     }
 
     @Override
-    @CacheEvict(value = "employees", allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "employee", allEntries = true)
+    })
     public void deleteAll() {
         employeeRepository.deleteAll();
     }

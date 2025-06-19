@@ -44,7 +44,7 @@ public class ClientController {
     @Operation(summary = "Add new client")
     public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto){
         try {
-            if (clientService.add(createClientDto).isActive()){
+            if (clientService.add(createClientDto) != null){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();

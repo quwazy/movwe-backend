@@ -2,7 +2,7 @@ package movwe.utils.interfaces;
 
 import java.util.List;
 
-public interface ServiceInterface<T> {
+public interface ServiceInterface {
     /**
      * Get one entity by its id
      * @param id of entity
@@ -21,7 +21,7 @@ public interface ServiceInterface<T> {
      * @param dto new entity as dto
      * @return new entity
      */
-    T add(DtoInterface dto);
+    DtoInterface add(DtoInterface dto);
 
     /**
      * Update one entity
@@ -29,7 +29,7 @@ public interface ServiceInterface<T> {
      * @param dto with new values
      * @return updated entity
      */
-    T update(Long id, DtoInterface dto);
+    DtoInterface update(Long id, DtoInterface dto);
 
     /**
      * Delete one entity in a table

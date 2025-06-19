@@ -8,21 +8,24 @@ import movwe.domains.clients.mappers.ClientMapper;
 import movwe.repositories.ClientRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ClientService implements ServiceInterface<Client> {
+public class ClientService implements ServiceInterface {
     private ClientRepository clientRepository;
 
     @Override
+    @Cacheable(value = "client", key = "#id")
     public DtoInterface get(Long id) {
         return ClientMapper.INSTANCE.fromClientToDto(clientRepository.findById(id).orElse(null));
     }
 
     @Override
+    @Cacheable(value = "clients")
     public List<ClientDto> getAll() {
         return clientRepository.findAll()
                 .stream()
@@ -31,15 +34,15 @@ public class ClientService implements ServiceInterface<Client> {
     }
 
     @Override
-    public Client add(DtoInterface dto) {
+    public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateClientDto createClientDto){
-            return clientRepository.save(ClientMapper.INSTANCE.fromDtoToClient(createClientDto));
+            return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(ClientMapper.INSTANCE.fromDtoToClient(createClientDto)));
         }
         return null;
     }
 
     @Override
-    public Client update(Long id, DtoInterface dto) {
+    public DtoInterface update(Long id, DtoInterface dto) {
         return null;
     }
 

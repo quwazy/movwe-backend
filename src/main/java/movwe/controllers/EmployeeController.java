@@ -46,8 +46,9 @@ public class EmployeeController {
     @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee")
     public ResponseEntity<?> addEmployee(@Valid @RequestBody CreateEmployeeDto createEmployeeDto) {
+        System.out.println(createEmployeeDto.toString());
         try {
-            if (employeeService.add(createEmployeeDto).isActive()){
+            if (employeeService.add(createEmployeeDto) != null){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
