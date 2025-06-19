@@ -16,22 +16,29 @@ services:
     networks:
       - movwe-network
 
-#  mongodb:
-#    image: mongo:6
-#    container_name: mongo-db
-#    restart: always
-#    ports:
-#      - "27017:27017"
-#    volumes:
-#      - mongo-data:/data/db
-#    networks:
-#      - movwe-network
+  mongo:
+    image: mongo:8
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: movwe
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - movwe-network
 
   redis:
-    image: redis:8.0-alpine
+    image: redis:8
+    container_name: redis
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - movwe-network
 
   backend:
     build:
@@ -39,22 +46,32 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     ports:
-      - "8080:8080"
+      - "9999:9999"
     environment:
+      #Postgresql
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movwe
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
 
-#      SPRING_DATA_MONGODB_URI: mongodb://mongo-db:27017/mydatabase
+      #MongoDB
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/movwe?authSource=admin
+
+      #Redis
+      SPRING_CACHE_TYPE: redis
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_REDIS_TIME-TO-LIVE: 900000
+
     depends_on:
       - postgres
-#      - mongodb
+      - mongo
+      - redis
     networks:
       - movwe-network
 
 volumes:
   postgres-data:
-#      mongo-data:
+  mongo-data:
 
 networks:
   movwe-network:

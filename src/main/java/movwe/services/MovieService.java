@@ -24,22 +24,20 @@ public class MovieService implements ServiceInterface {
     }
 
     @Override
-    public boolean add(DtoInterface dto) {
-        return false;
+    public DtoInterface add(DtoInterface dto) {
+        return null;
     }
 
     @Override
-    public boolean update(Long id, DtoInterface dto) {
-        return false;
+    public DtoInterface update(Long id, DtoInterface dto) {
+        return null;
     }
 
     @Override
-    public boolean delete(Long id) {
-        return false;
+    public void delete(Long id) {
     }
 
     @Override
-    public boolean deleteAll() {
-        return false;
+    public void deleteAll() {
     }
 }

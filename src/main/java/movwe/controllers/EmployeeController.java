@@ -46,8 +46,9 @@ public class EmployeeController {
     @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee")
     public ResponseEntity<?> addEmployee(@Valid @RequestBody CreateEmployeeDto createEmployeeDto) {
+        System.out.println(createEmployeeDto.toString());
         try {
-            if (employeeService.add(createEmployeeDto)){
+            if (employeeService.add(createEmployeeDto) != null){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
@@ -60,12 +61,8 @@ public class EmployeeController {
     @Operation(summary = "Delete employee by id")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
         try {
-            if (employeeService.delete(id)) {
-                return ResponseEntity.ok().build();
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
+            employeeService.delete(id);
+            return ResponseEntity.ok().build();
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -75,12 +72,8 @@ public class EmployeeController {
     @Operation(summary = "Delete all employees in table")
     public ResponseEntity<?> deleteAllEmployees() {
         try {
-            if (employeeService.deleteAll()) {
-                return ResponseEntity.ok().build();
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
+            employeeService.deleteAll();
+            return ResponseEntity.ok().build();
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
