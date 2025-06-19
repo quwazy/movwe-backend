@@ -44,7 +44,7 @@ public class ClientController {
     @Operation(summary = "Add new client")
     public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto){
         try {
-            if (clientService.add(createClientDto)){
+            if (clientService.add(createClientDto).isActive()){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
@@ -57,12 +57,8 @@ public class ClientController {
     @Operation(summary = "Delete client by id")
     public ResponseEntity<?> deleteClient(@PathVariable Long id) {
         try {
-            if (clientService.delete(id)) {
-                return ResponseEntity.ok().build();
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
+            this.clientService.delete(id);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -72,12 +68,8 @@ public class ClientController {
     @Operation(summary = "Delete all clients in table")
     public ResponseEntity<?> deleteAllClients() {
         try {
-            if (clientService.deleteAll()) {
-                return ResponseEntity.ok().build();
-            }
-            else {
-                return ResponseEntity.badRequest().build();
-            }
+            clientService.deleteAll();
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

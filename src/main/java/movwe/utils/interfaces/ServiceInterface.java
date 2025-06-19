@@ -2,7 +2,7 @@ package movwe.utils.interfaces;
 
 import java.util.List;
 
-public interface ServiceInterface {
+public interface ServiceInterface<T> {
     /**
      * Get one entity by its id
      * @param id of entity
@@ -11,7 +11,7 @@ public interface ServiceInterface {
     DtoInterface get(Long id);
 
     /**
-     * Get all entities in database table
+     * Get all entities in the database table
      * @return T as List of Objects
      */
     List<?> getAll();
@@ -19,28 +19,26 @@ public interface ServiceInterface {
     /**
      * Insert entity into database table
      * @param dto new entity as dto
-     * @return if operation was successful
+     * @return new entity
      */
-    boolean add(DtoInterface dto);
+    T add(DtoInterface dto);
 
     /**
      * Update one entity
-     * @param id of entity in database table
+     * @param id of entity in the database table
      * @param dto with new values
-     * @return if opearation was successful
+     * @return updated entity
      */
-    boolean update(Long id, DtoInterface dto);
+    T update(Long id, DtoInterface dto);
 
     /**
      * Delete one entity in a table
      * @param id of entity
-     * @return if operation was successful
      */
-    boolean delete(Long id);
+    void delete(Long id);
 
     /**
-     * Empty whole table
-     * @return if operation was successful
+     * Empty the whole database table
      */
-    boolean deleteAll();
+    void deleteAll();
 }

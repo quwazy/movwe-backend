@@ -1,6 +1,7 @@
 package movwe.services;
 
 import lombok.AllArgsConstructor;
+import movwe.domains.movies.entities.Movie;
 import movwe.repositories.MovieRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class MovieService implements ServiceInterface {
+public class MovieService implements ServiceInterface<Movie> {
     private final MovieRepository movieRepository;
 
     @Override
@@ -24,22 +25,20 @@ public class MovieService implements ServiceInterface {
     }
 
     @Override
-    public boolean add(DtoInterface dto) {
-        return false;
+    public Movie add(DtoInterface dto) {
+        return null;
     }
 
     @Override
-    public boolean update(Long id, DtoInterface dto) {
-        return false;
+    public Movie update(Long id, DtoInterface dto) {
+        return null;
     }
 
     @Override
-    public boolean delete(Long id) {
-        return false;
+    public void delete(Long id) {
     }
 
     @Override
-    public boolean deleteAll() {
-        return false;
+    public void deleteAll() {
     }
 }
