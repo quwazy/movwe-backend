@@ -7,6 +7,7 @@ import movwe.utils.interfaces.ServiceInterface;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -14,7 +15,7 @@ public class MovieService implements ServiceInterface {
     private final MovieRepository movieRepository;
 
     @Override
-    public DtoInterface get(Long id) {
+    public Optional<DtoInterface> get(Long id) {
         return null;
     }
 

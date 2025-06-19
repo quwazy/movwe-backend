@@ -1,6 +1,7 @@
 package movwe.utils.interfaces;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ServiceInterface {
     /**
@@ -8,7 +9,7 @@ public interface ServiceInterface {
      * @param id of entity
      * @return T as Object
      */
-    DtoInterface get(Long id);
+    Optional<DtoInterface> get(Long id);
 
     /**
      * Get all entities in the database table

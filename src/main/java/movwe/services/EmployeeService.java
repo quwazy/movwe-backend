@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -24,9 +25,9 @@ public class EmployeeService implements ServiceInterface {
     private EmployeeRepository employeeRepository;
 
     @Override
-    @Cacheable(value = "employee", key = "#id")
-    public EmployeeDto get(Long id) {
-        return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.findById(id).orElse(null));
+    @Cacheable(value = "employee", key = "#id", unless = "#result == null")
+    public Optional<DtoInterface> get(Long id) {
+        return employeeRepository.findById(id).map(EmployeeMapper.INSTANCE::fromEmployeeToDto);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class EmployeeService implements ServiceInterface {
 
     @Override
     @CacheEvict(value = "employees", allEntries = true)
-    @CachePut(value = "employee", key = "#result.id", condition = "#result != null")
+    @CachePut(value = "employee", key = "#result.id", condition = "#dto != null", unless = "#result == null")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateEmployeeDto createEmployeeDto && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
             Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
