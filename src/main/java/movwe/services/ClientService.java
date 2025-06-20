@@ -122,4 +122,16 @@ public class ClientService implements ServiceInterface {
     public void deleteAll() {
         clientRepository.deleteAll();
     }
+
+    public void removeFriend(String email, String friendUsername){
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
+
+        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
+            Client client = optionalClient.get();
+            client.getFriends().remove(optionalFriend.get());
+            clientRepository.saveAndFlush(client);
+            System.out.println("REMOVED");
+        }
+    }
 }

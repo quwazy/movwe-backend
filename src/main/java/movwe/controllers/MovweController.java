@@ -64,4 +64,15 @@ public class MovweController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
+    @DeleteMapping(path = "/removeFriend", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Remove friend from friend list")
+    public ResponseEntity<?> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
+        try {
+            clientService.removeFriend(jwtService.extractEmail(token.substring(7)), friendDto.getUsername());
+            return ResponseEntity.ok().build();
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
 }
