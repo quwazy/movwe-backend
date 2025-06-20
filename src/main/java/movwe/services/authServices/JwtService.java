@@ -13,7 +13,7 @@ import java.util.Date;
 public class JwtService implements Serializable {
     @Value( "${jwt.secret.key}")
     private String SECRET_KEY;
-    private final long EXPIRATION_TIME = 1000 * 60 * 10;    //10 minutes
+    private final long EXPIRATION_TIME = 1000 * 60 * 100;    //100 minutes
 
     /// Generate a JWT token
     public String generateToken(String email) {

@@ -5,10 +5,13 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import movwe.domains.employees.dtos.CreateEmployeeDto;
 import movwe.services.EmployeeService;
+import movwe.utils.interfaces.DtoInterface;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -21,11 +24,9 @@ public class EmployeeController {
     @Operation(summary = "Get employee by id")
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
         try {
-            if (id == null) {
-                return ResponseEntity.badRequest().build();
-            }
-            if (employeeService.get(id) != null){
-                return ResponseEntity.ok(employeeService.get(id));
+            Optional<DtoInterface> employeeDto = employeeService.get(id);
+            if (employeeDto.isPresent()) {
+                return ResponseEntity.ok(employeeDto.get());
             }
             return ResponseEntity.badRequest().body("Employee with id " + id + " does not exist");
         } catch (Exception ex) {
@@ -46,7 +47,6 @@ public class EmployeeController {
     @PostMapping(path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new employee")
     public ResponseEntity<?> addEmployee(@Valid @RequestBody CreateEmployeeDto createEmployeeDto) {
-        System.out.println(createEmployeeDto.toString());
         try {
             if (employeeService.add(createEmployeeDto) != null){
                 return ResponseEntity.ok().build();

@@ -8,20 +8,27 @@ import movwe.domains.clients.mappers.ClientMapper;
 import movwe.repositories.ClientRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class ClientService implements ServiceInterface {
     private ClientRepository clientRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Cacheable(value = "client", key = "#id")
-    public DtoInterface get(Long id) {
-        return ClientMapper.INSTANCE.fromClientToDto(clientRepository.findById(id).orElse(null));
+    @Cacheable(value = "client", key = "#id", unless = "#result == null")
+    public Optional<DtoInterface> get(Long id) {
+        return clientRepository.findById(id).map(ClientMapper.INSTANCE::fromClientToDto);
     }
 
     @Override
@@ -33,10 +40,19 @@ public class ClientService implements ServiceInterface {
                 .toList();
     }
 
+    @Cacheable(value = "clientByEmail", key = "#email", unless = "#result == null")
+    public Optional<Client> getByEmail(String email) {
+        return clientRepository.findByEmail(email);
+    }
+
     @Override
+    @CacheEvict(value = "clients", allEntries = true)
+    @CachePut(value = "client", key = "result.id", condition = "#dto != null", unless = "#result == null")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateClientDto createClientDto){
-            return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(ClientMapper.INSTANCE.fromDtoToClient(createClientDto)));
+            Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
+            client.setPassword(passwordEncoder.encode(createClientDto.getPassword()));
+            return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
         }
         return null;
     }
@@ -46,17 +62,40 @@ public class ClientService implements ServiceInterface {
         return null;
     }
 
-    @Override
-    public void delete(Long id) {
-        if (clientRepository.existsById(id)) {
-            clientRepository.deleteById(id);
-        }
+    @Caching(evict = {
+            @CacheEvict(value = "clinet", key = "#id"),
+            @CacheEvict(value = "clients", allEntries = true),
+            @CacheEvict(value = "userByEmail", allEntries = true)
+    })
+    @CachePut(value = "client", key = "#id", condition = "#result != null ")
+    public DtoInterface changeActive(Long id) {
+        return clientRepository.findById(id)
+                .map(client -> {
+                    client.setActive(!client.isActive());
+                    Client saved = clientRepository.save(client);
+                    return ClientMapper.INSTANCE.fromClientToDto(saved);
+                })
+                .orElse(null);
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "employee", key = "#id"),
+            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "userByEmail", allEntries = true)
+    })
+    public void delete(Long id) {
+        clientRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+            @CacheEvict(value = "clients", allEntries = true),
+            @CacheEvict(value = "client", allEntries = true),
+            @CacheEvict(value = "userByEmail", allEntries = true)
+    })
     public void deleteAll() {
-        if (clientRepository.count() != 0) {
-            clientRepository.deleteAll();
-        }
+        clientRepository.deleteAll();
     }
 }
