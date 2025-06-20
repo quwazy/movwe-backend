@@ -1,7 +1,9 @@
 package movwe.services;
 
 import lombok.AllArgsConstructor;
+import movwe.domains.clients.dtos.FriendDto;
 import movwe.domains.clients.entities.Client;
+import movwe.domains.clients.mappers.ClientMapper;
 import movwe.domains.movies.dtos.ClientMovieDto;
 import movwe.domains.movies.dtos.CreateMovieDto;
 import movwe.domains.movies.entities.Movie;
@@ -11,6 +13,7 @@ import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +38,16 @@ public class MovieService implements ServiceInterface {
                 .stream()
                 .map(MovieMapper.INSTANCE::fromMovieToDto)
                 .toList();
+    }
+
+    public List<FriendDto> getFriendsList(String email){
+        return clientService.getByEmail(email)
+                .map(Client::getFriends)
+                .orElseGet(Collections::emptySet)
+                .stream()
+                .map(ClientMapper.INSTANCE::fromClientToFriendDto)
+                .toList();
+
     }
 
     @Override

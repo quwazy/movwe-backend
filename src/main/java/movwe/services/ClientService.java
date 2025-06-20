@@ -3,6 +3,7 @@ package movwe.services;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.ClientDto;
 import movwe.domains.clients.dtos.CreateClientDto;
+import movwe.domains.clients.dtos.FriendDto;
 import movwe.domains.clients.entities.Client;
 import movwe.domains.clients.mappers.ClientMapper;
 import movwe.repositories.ClientRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +46,10 @@ public class ClientService implements ServiceInterface {
         return clientRepository.findByEmail(email);
     }
 
+    public Optional<Client> getByUsername(String username) {
+        return clientRepository.findByUsername(username);
+    }
+
     @Override
     @CacheEvict(value = "clients", allEntries = true)
     @CachePut(value = "client", key = "result.id", condition = "#dto != null", unless = "#result == null")
@@ -54,6 +60,25 @@ public class ClientService implements ServiceInterface {
             return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
         }
         return null;
+    }
+
+    public List<FriendDto> addFriend(String email, String friendUsername){
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
+
+        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
+            Client client = optionalClient.get();
+            Client friend = optionalFriend.get();
+            client.getFriends().add(friend);
+            clientRepository.save(client);
+            return client.getFriends()
+                    .stream()
+                    .map(ClientMapper.INSTANCE::fromClientToFriendDto)
+                    .toList();
+        } else {
+            return Collections.emptyList();
+        }
+
     }
 
     @Override

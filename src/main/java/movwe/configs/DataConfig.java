@@ -44,5 +44,14 @@ public class DataConfig implements CommandLineRunner {
             client.setUsername("test");
             clientRepository.saveAndFlush(client);
         }
+
+        Optional<Client> testFriendClient = clientRepository.findByEmail("testfriend@gmail.com");
+        if (testFriendClient.isEmpty()){
+            Client client = new Client();
+            client.setEmail("testfriend@gmail.com");
+            client.setPassword(passwordEncoder.encode("12345"));
+            client.setUsername("testfriend");
+            clientRepository.saveAndFlush(client);
+        }
     }
 }
