@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ClientService implements ServiceInterface {
     private ClientRepository clientRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Cacheable(value = "client", key = "#id", unless = "#result == null")
@@ -38,12 +40,19 @@ public class ClientService implements ServiceInterface {
                 .toList();
     }
 
+    @Cacheable(value = "clientByEmail", key = "#email", unless = "#result == null")
+    public Optional<Client> getByEmail(String email) {
+        return clientRepository.findByEmail(email);
+    }
+
     @Override
     @CacheEvict(value = "clients", allEntries = true)
     @CachePut(value = "client", key = "result.id", condition = "#dto != null", unless = "#result == null")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateClientDto createClientDto){
-            return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(ClientMapper.INSTANCE.fromDtoToClient(createClientDto)));
+            Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
+            client.setPassword(passwordEncoder.encode(createClientDto.getPassword()));
+            return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
         }
         return null;
     }
@@ -55,7 +64,8 @@ public class ClientService implements ServiceInterface {
 
     @Caching(evict = {
             @CacheEvict(value = "clinet", key = "#id"),
-            @CacheEvict(value = "clients", allEntries = true)
+            @CacheEvict(value = "clients", allEntries = true),
+            @CacheEvict(value = "userByEmail", allEntries = true)
     })
     @CachePut(value = "client", key = "#id", condition = "#result != null ")
     public DtoInterface changeActive(Long id) {
@@ -71,7 +81,8 @@ public class ClientService implements ServiceInterface {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "employee", key = "#id"),
-            @CacheEvict(value = "employees", allEntries = true)
+            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void delete(Long id) {
         clientRepository.deleteById(id);
@@ -81,7 +92,8 @@ public class ClientService implements ServiceInterface {
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
             @CacheEvict(value = "clients", allEntries = true),
-            @CacheEvict(value = "client", allEntries = true)
+            @CacheEvict(value = "client", allEntries = true),
+            @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void deleteAll() {
         clientRepository.deleteAll();
