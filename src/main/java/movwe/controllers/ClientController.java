@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
 @RequestMapping(path = "/api/clients")
 public class ClientController {
     private final ClientService clientService;
@@ -56,7 +57,6 @@ public class ClientController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(path = "/active/{id}")
     @Operation(summary = "changing client's active field")
     public ResponseEntity<?> changeClientActive(@PathVariable Long id){
