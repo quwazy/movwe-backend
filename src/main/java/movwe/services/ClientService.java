@@ -40,7 +40,6 @@ public class ClientService implements ServiceInterface {
                 .toList();
     }
 
-    @Cacheable(value = "clientByEmail", key = "#email", unless = "#result == null")
     public Optional<Client> getByEmail(String email) {
         return clientRepository.findByEmail(email);
     }
@@ -80,8 +79,8 @@ public class ClientService implements ServiceInterface {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "employee", key = "#id"),
-            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "client", key = "#id"),
+            @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void delete(Long id) {
@@ -91,8 +90,8 @@ public class ClientService implements ServiceInterface {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "client", allEntries = true),
+            @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void deleteAll() {
