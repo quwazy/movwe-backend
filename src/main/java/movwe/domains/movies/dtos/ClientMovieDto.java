@@ -5,10 +5,9 @@ import lombok.Data;
 import movwe.utils.interfaces.DtoInterface;
 
 @Data
-public class CreateMovieDto implements DtoInterface {
-    @Schema(description = "Movie title")
+@Schema(description = "Represents client movie entity from database")
+public class ClientMovieDto implements DtoInterface {
     private String title;
-    @Schema(description = "Your description of the movie")
     private String description;
     private String yearOfRelease;
     private String trailerUrl;

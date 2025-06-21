@@ -3,6 +3,7 @@ package movwe.services;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.ClientDto;
 import movwe.domains.clients.dtos.CreateClientDto;
+import movwe.domains.clients.dtos.FriendDto;
 import movwe.domains.clients.entities.Client;
 import movwe.domains.clients.mappers.ClientMapper;
 import movwe.repositories.ClientRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +42,12 @@ public class ClientService implements ServiceInterface {
                 .toList();
     }
 
-    @Cacheable(value = "clientByEmail", key = "#email", unless = "#result == null")
     public Optional<Client> getByEmail(String email) {
         return clientRepository.findByEmail(email);
+    }
+
+    public Optional<Client> getByUsername(String username) {
+        return clientRepository.findByUsername(username);
     }
 
     @Override
@@ -55,6 +60,25 @@ public class ClientService implements ServiceInterface {
             return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
         }
         return null;
+    }
+
+    public List<FriendDto> addFriend(String email, String friendUsername){
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
+
+        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
+            Client client = optionalClient.get();
+            Client friend = optionalFriend.get();
+            client.getFriends().add(friend);
+            clientRepository.save(client);
+            return client.getFriends()
+                    .stream()
+                    .map(ClientMapper.INSTANCE::fromClientToFriendDto)
+                    .toList();
+        } else {
+            return Collections.emptyList();
+        }
+
     }
 
     @Override
@@ -80,8 +104,8 @@ public class ClientService implements ServiceInterface {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "employee", key = "#id"),
-            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "client", key = "#id"),
+            @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void delete(Long id) {
@@ -91,11 +115,23 @@ public class ClientService implements ServiceInterface {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "client", allEntries = true),
+            @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void deleteAll() {
         clientRepository.deleteAll();
+    }
+
+    public void removeFriend(String email, String friendUsername){
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
+
+        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
+            Client client = optionalClient.get();
+            client.getFriends().remove(optionalFriend.get());
+            clientRepository.saveAndFlush(client);
+            System.out.println("REMOVED");
+        }
     }
 }
