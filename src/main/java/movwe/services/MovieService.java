@@ -71,9 +71,11 @@ public class MovieService implements ServiceInterface {
 
     @Override
     public void delete(Long id) {
+        movieRepository.deleteById(id);
     }
 
     @Override
     public void deleteAll() {
+        movieRepository.deleteAll();
     }
 }
