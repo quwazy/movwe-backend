@@ -1,11 +1,19 @@
 package movwe.services;
 
 import lombok.AllArgsConstructor;
+import movwe.domains.clients.dtos.FriendDto;
+import movwe.domains.clients.entities.Client;
+import movwe.domains.clients.mappers.ClientMapper;
+import movwe.domains.movies.dtos.ClientMovieDto;
+import movwe.domains.movies.dtos.CreateMovieDto;
+import movwe.domains.movies.entities.Movie;
+import movwe.domains.movies.mappers.MovieMapper;
 import movwe.repositories.MovieRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +21,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class MovieService implements ServiceInterface {
     private final MovieRepository movieRepository;
+    private final ClientService clientService;
 
     @Override
     public Optional<DtoInterface> get(Long id) {
@@ -24,8 +33,34 @@ public class MovieService implements ServiceInterface {
         return List.of();
     }
 
+    public List<ClientMovieDto> getAllMovies(String email){
+        return movieRepository.findAllByClient(clientService.getByEmail(email).orElse(null))
+                .stream()
+                .map(MovieMapper.INSTANCE::fromMovieToDto)
+                .toList();
+    }
+
+    public List<FriendDto> getFriendsList(String email){
+        return clientService.getByEmail(email)
+                .map(Client::getFriends)
+                .orElseGet(Collections::emptySet)
+                .stream()
+                .map(ClientMapper.INSTANCE::fromClientToFriendDto)
+                .toList();
+
+    }
+
     @Override
     public DtoInterface add(DtoInterface dto) {
+        return null;
+    }
+
+    public DtoInterface addMovie(String email, CreateMovieDto createMovieDto){
+        if (email != null && createMovieDto != null){
+            Movie movie = MovieMapper.INSTANCE.fromDtoToMovie(createMovieDto);
+            movie.setClient(clientService.getByEmail(email).orElse(null));
+            return MovieMapper.INSTANCE.fromMovieToDto(movieRepository.save(movie));
+        }
         return null;
     }
 
@@ -36,9 +71,11 @@ public class MovieService implements ServiceInterface {
 
     @Override
     public void delete(Long id) {
+        movieRepository.deleteById(id);
     }
 
     @Override
     public void deleteAll() {
+        movieRepository.deleteAll();
     }
 }

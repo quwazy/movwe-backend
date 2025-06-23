@@ -87,6 +87,13 @@
             <artifactId>java-jwt</artifactId>
             <version>4.5.0</version>
         </dependency>
+<!--        flyway-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>11.9.1</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

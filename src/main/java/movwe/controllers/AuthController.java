@@ -65,11 +65,13 @@ public class AuthController {
             securityContext.setAuthentication(authentication);
         } catch (Exception e) {
             loginRequest.setSuccessful(false);
+            loginRequest.setRequestTime(System.currentTimeMillis()/1000L);
             loginRequestService.save(loginRequest);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
         loginRequest.setSuccessful(true);
+        loginRequest.setRequestTime(System.currentTimeMillis()/1000L);
         loginRequestService.save(loginRequest);
         return ResponseEntity.ok(new JwtDto(jwtService.generateToken(loginDto.getEmail())));
     }
