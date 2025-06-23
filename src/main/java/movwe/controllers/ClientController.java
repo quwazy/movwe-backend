@@ -91,7 +91,7 @@ public class ClientController {
     @Operation(summary = "Delete client by id")
     public ResponseEntity<?> deleteClient(@PathVariable Long id) {
         try {
-            this.clientService.delete(id);
+            clientService.delete(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -115,7 +115,7 @@ public class ClientController {
     @Operation(summary = "Delete all clients in table")
     public ResponseEntity<?> deleteAllClients() {
         try {
-            this.clientService.deleteAll();
+            clientService.deleteAll();
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

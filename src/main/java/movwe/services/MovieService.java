@@ -23,17 +23,12 @@ public class MovieService implements ServiceInterface {
 
     @Override
     public Optional<DtoInterface> get(Long id) {
-        Movie movie = movieRepository.findById(id).orElse(null);
-        if (movie != null && movie.getClient() != null) {
-            EmployeeMovieDto employeeMovieDto = MovieMapper.INSTANCE.fromMovieToEmployeeMovieDto(movie);
-            return Optional.of(employeeMovieDto);
-        }
-        return Optional.empty();
+        return movieRepository.findById(id).map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto);
     }
 
     @Override
     public List<EmployeeMovieDto> getAll() {
-        return movieRepository.findAll().stream().map( MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto).toList();
+        return movieRepository.findAll().stream().map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto).toList();
     }
 
     public List<EmployeeMovieDto> getAllByClient(String email) {
@@ -57,13 +52,12 @@ public class MovieService implements ServiceInterface {
         return null;
     }
 
-    public DtoInterface addMovie(String email, CreateMovieDto createMovieDto){
+    public DtoInterface addMovie(String email, CreateMovieDto createMovieDto) {
         if (email != null && createMovieDto != null){
             Movie movie = MovieMapper.INSTANCE.fromDtoToMovie(createMovieDto);
             Client client = clientService.getByEmail(email).orElse(null);
             if (client != null) {
                 movie.setClient(client);
-                movieRepository.save(movie);
                 return MovieMapper.INSTANCE.fromMovieToDto(movieRepository.save(movie));
             }
             return null;
@@ -79,6 +73,10 @@ public class MovieService implements ServiceInterface {
     @Override
     public void delete(Long id) {
         movieRepository.deleteById(id);
+    }
+
+    public void deleteAllByClientEmail(String email) {
+        movieRepository.deleteAllByClient_Email(email);
     }
 
     @Override

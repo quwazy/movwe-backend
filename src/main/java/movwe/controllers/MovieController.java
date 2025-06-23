@@ -19,7 +19,7 @@ public class MovieController {
     private final MovieService movieService;
 
     @GetMapping(path = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get all movies in database")
+    @Operation(summary = "Get movie by its id")
     public ResponseEntity<?> getMovie(@PathVariable Long id) {
         try{
             Optional<DtoInterface> movieDto = movieService.get(id);

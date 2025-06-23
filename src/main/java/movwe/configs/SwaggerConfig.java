@@ -10,10 +10,9 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("MOWVE REST API")
-                        .version("0.0.1")
-                        .description("This is my API documentation using Swagger"));
+        return new OpenAPI().info(new Info()
+                .title("MOVWE REST API")
+                .version("1.0")
+                .description("This is API documentation for MOVWE web application"));
     }
 }

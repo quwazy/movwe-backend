@@ -50,7 +50,6 @@ public class ClientService implements ServiceInterface {
                 .toList();
     }
 
-//    @Cacheable(value = "clientFriends", key = "#email", unless = "#result == null")
     public List<FriendDto> getFriendsList(String email) {
         return clientRepository.findByEmail(email)
                 .map(client -> client.getFriends()
@@ -100,13 +99,12 @@ public class ClientService implements ServiceInterface {
             @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", key = "#email")
     })
-    @CachePut(value = "client", key = "#email", condition = "#result != null ")
+    @CachePut(value = "client", key = "#email", unless = "#result == null")
     public DtoInterface updateActivity(String email) {
         return clientRepository.findByEmail(email)
                 .map(client -> {
                     client.setActive(!client.isActive());
-                    Client saved = clientRepository.save(client);
-                    return ClientMapper.INSTANCE.fromClientToDto(saved);
+                    return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
                 })
                 .orElse(null);
     }
@@ -130,6 +128,17 @@ public class ClientService implements ServiceInterface {
         clientRepository.deleteByEmail(email);
     }
 
+    public void removeFriend(String email, String friendUsername) {
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
+
+        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
+            Client client = optionalClient.get();
+            client.getFriends().remove(optionalFriend.get());
+            clientRepository.saveAndFlush(client);
+        }
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
@@ -139,16 +148,5 @@ public class ClientService implements ServiceInterface {
     })
     public void deleteAll() {
         clientRepository.deleteAll();
-    }
-
-    public void removeFriend(String email, String friendUsername){
-        Optional<Client> optionalClient = clientRepository.findByEmail(email);
-        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
-
-        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
-            Client client = optionalClient.get();
-            client.getFriends().remove(optionalFriend.get());
-            clientRepository.saveAndFlush(client);
-        }
     }
 }

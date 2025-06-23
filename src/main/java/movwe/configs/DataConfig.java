@@ -24,7 +24,6 @@ public class DataConfig implements CommandLineRunner {
         /// ovde popuni sifrarnike na kraju
 
         Optional<Employee> adminEmployee = employeeRepository.findByEmail("jane06.ristic@gmail.com");
-
         if (adminEmployee.isEmpty()) {
             Employee employee = new Employee();
             employee.setRole(Role.ADMIN);
@@ -36,7 +35,6 @@ public class DataConfig implements CommandLineRunner {
         }
 
         Optional<Client> testClient = clientRepository.findByEmail("test@gmail.com");
-
         if (testClient.isEmpty()) {
             Client client = new Client();
             client.setEmail("test@gmail.com");
