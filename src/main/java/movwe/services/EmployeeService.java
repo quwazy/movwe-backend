@@ -27,9 +27,13 @@ public class EmployeeService implements ServiceInterface {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Cacheable(value = "employee", key = "#id", unless = "#result == null")
     public Optional<DtoInterface> get(Long id) {
         return employeeRepository.findById(id).map(EmployeeMapper.INSTANCE::fromEmployeeToDto);
+    }
+
+    @Cacheable(value = "employee", key = "#email", unless = "#result == null")
+    public Optional<Employee> getByEmail(String email) {
+        return employeeRepository.findByEmail(email);
     }
 
     @Override
@@ -41,14 +45,9 @@ public class EmployeeService implements ServiceInterface {
                 .toList();
     }
 
-    @Cacheable(value = "employeeByEmail", key = "#email", unless = "#result == null")
-    public Optional<Employee> getByEmail(String email) {
-        return employeeRepository.findByEmail(email);
-    }
-
     @Override
     @CacheEvict(value = "employees", allEntries = true)
-    @CachePut(value = "employee", key = "#result.id", condition = "#dto != null", unless = "#result == null")
+    @CachePut(value = "employee", key = "#result.email", condition = "#dto != null", unless = "#result == null")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateEmployeeDto createEmployeeDto && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
             Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
@@ -66,7 +65,7 @@ public class EmployeeService implements ServiceInterface {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "employee", key = "#id"),
+            @CacheEvict(value = "employee", allEntries = true),
             @CacheEvict(value = "employees", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
@@ -74,11 +73,20 @@ public class EmployeeService implements ServiceInterface {
         employeeRepository.deleteById(id);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "employee", key = "#email"),
+            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "userByEmail", key = "#email")
+    })
+    public void deleteByEmail(String email){
+        employeeRepository.deleteByEmail(email);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "employees", allEntries = true),
             @CacheEvict(value = "employee", allEntries = true),
+            @CacheEvict(value = "employees", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void deleteAll() {

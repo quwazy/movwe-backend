@@ -3,6 +3,12 @@ package movwe.utils.interfaces;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents an interface that should
+ * be implemented by every @Service
+ * class.
+ * Contains methods for CRUD operations.
+ */
 public interface ServiceInterface {
     /**
      * Get one entity by its id
