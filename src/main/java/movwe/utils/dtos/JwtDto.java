@@ -8,7 +8,8 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-@Schema(description = "Represents JWT token for logged in employee/client")
+@Schema(description = "Represents JWT token for logged employee/client")
 public class JwtDto implements Serializable {
+    @Schema(description = "JWT token")
     private String token;
 }

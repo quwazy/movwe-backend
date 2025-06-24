@@ -1,11 +1,10 @@
 package movwe.services;
 
 import lombok.AllArgsConstructor;
-import movwe.domains.clients.dtos.FriendDto;
 import movwe.domains.clients.entities.Client;
-import movwe.domains.clients.mappers.ClientMapper;
 import movwe.domains.movies.dtos.ClientMovieDto;
 import movwe.domains.movies.dtos.CreateMovieDto;
+import movwe.domains.movies.dtos.EmployeeMovieDto;
 import movwe.domains.movies.entities.Movie;
 import movwe.domains.movies.mappers.MovieMapper;
 import movwe.repositories.MovieRepository;
@@ -13,7 +12,6 @@ import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,29 +23,28 @@ public class MovieService implements ServiceInterface {
 
     @Override
     public Optional<DtoInterface> get(Long id) {
-        return null;
+        return movieRepository.findById(id).map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto);
     }
 
     @Override
-    public List<?> getAll() {
-        return List.of();
+    public List<EmployeeMovieDto> getAll() {
+        return movieRepository.findAll().stream().map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto).toList();
     }
 
-    public List<ClientMovieDto> getAllMovies(String email){
+    public List<EmployeeMovieDto> getAllByClient(String email) {
+        return movieRepository.findAllByClient(clientService.getByEmail(email).orElse(null)).stream().map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto).toList();
+    }
+
+    /**
+     * Get all movies by client's email
+     * @param email of client
+     * @return list of movies
+     * */
+    public List<ClientMovieDto> getAllMovies(String email) {
         return movieRepository.findAllByClient(clientService.getByEmail(email).orElse(null))
                 .stream()
                 .map(MovieMapper.INSTANCE::fromMovieToDto)
                 .toList();
-    }
-
-    public List<FriendDto> getFriendsList(String email){
-        return clientService.getByEmail(email)
-                .map(Client::getFriends)
-                .orElseGet(Collections::emptySet)
-                .stream()
-                .map(ClientMapper.INSTANCE::fromClientToFriendDto)
-                .toList();
-
     }
 
     @Override
@@ -55,11 +52,15 @@ public class MovieService implements ServiceInterface {
         return null;
     }
 
-    public DtoInterface addMovie(String email, CreateMovieDto createMovieDto){
+    public DtoInterface addMovie(String email, CreateMovieDto createMovieDto) {
         if (email != null && createMovieDto != null){
             Movie movie = MovieMapper.INSTANCE.fromDtoToMovie(createMovieDto);
-            movie.setClient(clientService.getByEmail(email).orElse(null));
-            return MovieMapper.INSTANCE.fromMovieToDto(movieRepository.save(movie));
+            Client client = clientService.getByEmail(email).orElse(null);
+            if (client != null) {
+                movie.setClient(client);
+                return MovieMapper.INSTANCE.fromMovieToDto(movieRepository.save(movie));
+            }
+            return null;
         }
         return null;
     }
@@ -72,6 +73,10 @@ public class MovieService implements ServiceInterface {
     @Override
     public void delete(Long id) {
         movieRepository.deleteById(id);
+    }
+
+    public void deleteAllByClientEmail(String email) {
+        movieRepository.deleteAllByClient_Email(email);
     }
 
     @Override

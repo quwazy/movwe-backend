@@ -28,9 +28,17 @@ public class ClientService implements ServiceInterface {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Cacheable(value = "client", key = "#id", unless = "#result == null")
     public Optional<DtoInterface> get(Long id) {
         return clientRepository.findById(id).map(ClientMapper.INSTANCE::fromClientToDto);
+    }
+
+    @Cacheable(value = "client", key = "#email", unless = "#result == null")
+    public Optional<Client> getByEmail(String email) {
+        return clientRepository.findByEmail(email);
+    }
+
+    public Optional<Client> getByUsername(String username) {
+        return clientRepository.findByUsername(username);
     }
 
     @Override
@@ -42,17 +50,18 @@ public class ClientService implements ServiceInterface {
                 .toList();
     }
 
-    public Optional<Client> getByEmail(String email) {
-        return clientRepository.findByEmail(email);
-    }
-
-    public Optional<Client> getByUsername(String username) {
-        return clientRepository.findByUsername(username);
+    public List<FriendDto> getFriendsList(String email) {
+        return clientRepository.findByEmail(email)
+                .map(client -> client.getFriends()
+                        .stream()
+                        .map(ClientMapper.INSTANCE::fromClientToFriendDto)
+                        .toList())
+                .orElse(Collections.emptyList());
     }
 
     @Override
     @CacheEvict(value = "clients", allEntries = true)
-    @CachePut(value = "client", key = "result.id", condition = "#dto != null", unless = "#result == null")
+    @CachePut(value = "client", key = "result.email", condition = "#dto != null", unless = "#result == null")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateClientDto createClientDto){
             Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
@@ -78,7 +87,6 @@ public class ClientService implements ServiceInterface {
         } else {
             return Collections.emptyList();
         }
-
     }
 
     @Override
@@ -87,29 +95,48 @@ public class ClientService implements ServiceInterface {
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "clinet", key = "#id"),
+            @CacheEvict(value = "clinet", key = "#email"),
             @CacheEvict(value = "clients", allEntries = true),
-            @CacheEvict(value = "userByEmail", allEntries = true)
+            @CacheEvict(value = "userByEmail", key = "#email")
     })
-    @CachePut(value = "client", key = "#id", condition = "#result != null ")
-    public DtoInterface changeActive(Long id) {
-        return clientRepository.findById(id)
+    @CachePut(value = "client", key = "#email", unless = "#result == null")
+    public DtoInterface updateActivity(String email) {
+        return clientRepository.findByEmail(email)
                 .map(client -> {
                     client.setActive(!client.isActive());
-                    Client saved = clientRepository.save(client);
-                    return ClientMapper.INSTANCE.fromClientToDto(saved);
+                    return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
                 })
                 .orElse(null);
     }
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "client", key = "#id"),
+            @CacheEvict(value = "client", allEntries = true),
             @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
     public void delete(Long id) {
         clientRepository.deleteById(id);
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "client", key = "#email"),
+            @CacheEvict(value = "clients", allEntries = true),
+            @CacheEvict(value = "userByEmail", key = "#email")
+    })
+    public void deleteByEmail(String email){
+        clientRepository.deleteByEmail(email);
+    }
+
+    public void removeFriend(String email, String friendUsername) {
+        Optional<Client> optionalClient = clientRepository.findByEmail(email);
+        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
+
+        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
+            Client client = optionalClient.get();
+            client.getFriends().remove(optionalFriend.get());
+            clientRepository.saveAndFlush(client);
+        }
     }
 
     @Override
@@ -121,17 +148,5 @@ public class ClientService implements ServiceInterface {
     })
     public void deleteAll() {
         clientRepository.deleteAll();
-    }
-
-    public void removeFriend(String email, String friendUsername){
-        Optional<Client> optionalClient = clientRepository.findByEmail(email);
-        Optional<Client> optionalFriend = clientRepository.findByUsername(friendUsername);
-
-        if (optionalClient.isPresent() && optionalFriend.isPresent()) {
-            Client client = optionalClient.get();
-            client.getFriends().remove(optionalFriend.get());
-            clientRepository.saveAndFlush(client);
-            System.out.println("REMOVED");
-        }
     }
 }

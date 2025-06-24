@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface LoginRequestRepository extends MongoRepository<LoginRequest, String> {
     Optional<List<LoginRequest>> findAllByEmail(String email);
+
     Optional<List<LoginRequest>> findByEmailAndRequestTimeAfterOrderByRequestTimeAsc(String email, Long requestTime);
 }

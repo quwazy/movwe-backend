@@ -23,7 +23,7 @@ public class MovweController {
     @Operation(summary = "Get all movies from one client")
     public ResponseEntity<?> getAllMovies(@RequestHeader("Authorization") String token) {
         try {
-            return ResponseEntity.ok(movieService.getAllMovies(jwtService.extractEmail(token.substring(7))));
+            return ResponseEntity.ok(movieService.getAllMovies(extractEmailFromJwt(token)));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -33,7 +33,7 @@ public class MovweController {
     @Operation(summary = "List all friends")
     public ResponseEntity<?> getFriendsList(@RequestHeader("Authorization") String token) {
         try {
-            return ResponseEntity.ok(movieService.getFriendsList(jwtService.extractEmail(token.substring(7))));
+            return ResponseEntity.ok(clientService.getFriendsList(jwtService.extractEmail(token.substring(7))));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -43,7 +43,7 @@ public class MovweController {
     @Operation(summary = "Client adds new movie on his list")
     public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String token, @RequestBody CreateMovieDto createMovieDto) {
         try {
-            if (movieService.addMovie(jwtService.extractEmail(token.substring(7)),createMovieDto) != null) {
+            if (movieService.addMovie(extractEmailFromJwt(token),createMovieDto) != null) {
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with adding movie to client's list");
@@ -56,7 +56,7 @@ public class MovweController {
     @Operation(summary = "Add client as friend")
     public ResponseEntity<?> addFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
         try {
-            if (!clientService.addFriend(jwtService.extractEmail(token.substring(7)), friendDto.getUsername()).isEmpty()){
+            if (!clientService.addFriend(extractEmailFromJwt(token), friendDto.getUsername()).isEmpty()){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with adding friend to friends list");
@@ -69,10 +69,14 @@ public class MovweController {
     @Operation(summary = "Remove friend from friend list")
     public ResponseEntity<?> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
         try {
-            clientService.removeFriend(jwtService.extractEmail(token.substring(7)), friendDto.getUsername());
+            clientService.removeFriend(extractEmailFromJwt(token), friendDto.getUsername());
             return ResponseEntity.ok().build();
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    private String extractEmailFromJwt(String jwt) {
+        return jwtService.extractEmail(jwt.substring(7));
     }
 }

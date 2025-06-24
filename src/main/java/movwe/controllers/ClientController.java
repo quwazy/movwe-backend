@@ -3,6 +3,8 @@ package movwe.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.CreateClientDto;
+import movwe.domains.clients.entities.Client;
+import movwe.domains.clients.mappers.ClientMapper;
 import movwe.services.ClientService;
 import movwe.utils.interfaces.DtoInterface;
 import org.springframework.http.MediaType;
@@ -14,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
 @RequestMapping(path = "/api/clients")
 public class ClientController {
     private final ClientService clientService;
@@ -29,6 +32,20 @@ public class ClientController {
                 return ResponseEntity.badRequest().body("Client with id " + id + " does not exist");
             }
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/getByEmail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get client by email")
+    public ResponseEntity<?> getClientByEmail(@PathVariable String email) {
+        try {
+            Optional<Client> client = clientService.getByEmail(email);
+            if (client.isPresent()) {
+                return ResponseEntity.ok(ClientMapper.INSTANCE.fromClientToDto(client.get()));
+            }
+            return ResponseEntity.badRequest().body("Employee with email " + email + " does not exist");
+        }catch (Exception ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
@@ -56,12 +73,11 @@ public class ClientController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(path = "/active/{id}")
+    @PutMapping(path = "/active/{email}")
     @Operation(summary = "changing client's active field")
-    public ResponseEntity<?> changeClientActive(@PathVariable Long id){
+    public ResponseEntity<?> changeClientActive(@PathVariable String email){
         try {
-            if (clientService.changeActive(id) != null){
+            if (clientService.updateActivity(email) != null){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();
@@ -75,10 +91,22 @@ public class ClientController {
     @Operation(summary = "Delete client by id")
     public ResponseEntity<?> deleteClient(@PathVariable Long id) {
         try {
-            this.clientService.delete(id);
+            clientService.delete(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(path = "/deleteByEmail/{email}")
+    @Operation(summary = "Delete client by email")
+    public ResponseEntity<?> deleteClientByEmail(@PathVariable String email) {
+        try {
+            clientService.deleteByEmail(email);
+            return ResponseEntity.ok().build();
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
@@ -87,7 +115,7 @@ public class ClientController {
     @Operation(summary = "Delete all clients in table")
     public ResponseEntity<?> deleteAllClients() {
         try {
-            this.clientService.deleteAll();
+            clientService.deleteAll();
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

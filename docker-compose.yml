@@ -49,7 +49,7 @@ services:
       - "9999:9999"
     environment:
       #Postgresql
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movwe
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/movwe?currentSchema=public
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
 
