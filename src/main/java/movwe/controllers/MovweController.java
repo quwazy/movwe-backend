@@ -33,7 +33,7 @@ public class MovweController {
     @Operation(summary = "List all friends")
     public ResponseEntity<?> getFriendsList(@RequestHeader("Authorization") String token) {
         try {
-            return ResponseEntity.ok(clientService.getFriendsList(jwtService.extractEmail(token.substring(7))));
+            return ResponseEntity.ok(clientService.getFriendsList(jwtService.extractEmail(extractEmailFromJwt(token))));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

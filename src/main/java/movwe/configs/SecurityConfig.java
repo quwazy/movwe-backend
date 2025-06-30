@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import movwe.utils.filters.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,7 +27,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -34,8 +34,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()  //swagger
                         .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .requestMatchers("/auth/**").permitAll()        //login
-                        .requestMatchers("/api/**").authenticated()     //api routes authenticated
-                        .anyRequest().denyAll()                           //block everything else unless explicitly allowed
+                        .requestMatchers(HttpMethod.OPTIONS, "/api").permitAll()     //allows OPTIONS header for all routes
+                        .anyRequest().authenticated()                                  //for everything else, you must be authenticated
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(JwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
