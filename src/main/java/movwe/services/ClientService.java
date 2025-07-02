@@ -37,8 +37,8 @@ public class ClientService implements ServiceInterface {
         return clientRepository.findByEmail(email);
     }
 
-    public Optional<Client> getByUsername(String username) {
-        return clientRepository.findByUsername(username);
+    public Optional<ClientDto> getByUsername(String username) {
+        return clientRepository.findByUsername(username).map(ClientMapper.INSTANCE::fromClientToDto);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ClientService implements ServiceInterface {
             @CacheEvict(value = "userByEmail", key = "#email")
     })
     @CachePut(value = "client", key = "#email", unless = "#result == null")
-    public DtoInterface updateActivity(String email) {
+    public ClientDto updateActivity(String email) {
         return clientRepository.findByEmail(email)
                 .map(client -> {
                     client.setActive(!client.isActive());

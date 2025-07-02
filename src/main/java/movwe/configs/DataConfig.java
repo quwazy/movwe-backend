@@ -34,6 +34,17 @@ public class DataConfig implements CommandLineRunner {
             employeeRepository.saveAndFlush(employee);
         }
 
+        Optional<Employee> editorEmployee = employeeRepository.findByEmail("ogi@gmail.com");
+        if (adminEmployee.isEmpty()) {
+            Employee employee = new Employee();
+            employee.setRole(Role.EDITOR);
+            employee.setEmail("ogi@gmail.com");
+            employee.setPassword(passwordEncoder.encode("12345"));
+            employee.setFirstName("Ogi");
+            employee.setLastName("Stojanovic");
+            employeeRepository.saveAndFlush(employee);
+        }
+
         Optional<Client> testClient = clientRepository.findByEmail("test@gmail.com");
         if (testClient.isEmpty()) {
             Client client = new Client();
