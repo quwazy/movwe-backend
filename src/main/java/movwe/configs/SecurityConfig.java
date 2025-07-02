@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()  //swagger
                         .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .requestMatchers("/auth/**").permitAll()        //login
-                        .requestMatchers(HttpMethod.OPTIONS, "/api").permitAll()     //allows OPTIONS header for all routes
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()     //allows OPTIONS header for all routes
                         .anyRequest().authenticated()                                  //for everything else, you must be authenticated
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
