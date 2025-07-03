@@ -75,6 +75,13 @@ public class MovieService implements ServiceInterface {
         movieRepository.deleteById(id);
     }
 
+    public void deleteClientMovies(Long id, String email) {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        if (movie != null && movie.getClient().getEmail().equals(email)) {
+            movieRepository.deleteById(id);
+        }
+    }
+
     public void deleteAllByClientEmail(String email) {
         movieRepository.deleteAllByClient_Email(email);
     }

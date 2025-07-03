@@ -65,6 +65,17 @@ public class MovweController {
         }
     }
 
+    @DeleteMapping(path = "/deleteMovie/{id}")
+    @Operation(summary = "Delete movie from client list")
+    public ResponseEntity<?> deleteMovie(@RequestHeader("Authorization") String token, @PathVariable Long id){
+        try {
+            movieService.deleteClientMovies(id, extractEmailFromJwt(token));
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping(path = "/removeFriend", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Remove friend from friend list")
     public ResponseEntity<?> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){

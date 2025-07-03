@@ -7,6 +7,7 @@ import movwe.utils.interfaces.DtoInterface;
 @Data
 @Schema(description = "Represents client movie entity from database")
 public class ClientMovieDto implements DtoInterface {
+    private Long id;
     private String title;
     private String description;
     private String yearOfRelease;
