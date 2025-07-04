@@ -40,9 +40,9 @@ public class ClientController {
     @Operation(summary = "Get client by email")
     public ResponseEntity<?> getClientByEmail(@PathVariable String email) {
         try {
-            Optional<Client> client = clientService.getByEmail(email);
-            if (client.isPresent()) {
-                return ResponseEntity.ok(ClientMapper.INSTANCE.fromClientToDto(client.get()));
+            Client client = clientService.getByEmail(email);
+            if (client != null) {
+                return ResponseEntity.ok(ClientMapper.INSTANCE.fromClientToDto(client));
             }
             return ResponseEntity.badRequest().body("Employee with email " + email + " does not exist");
         }catch (Exception ex){

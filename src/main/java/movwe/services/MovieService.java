@@ -32,7 +32,7 @@ public class MovieService implements ServiceInterface {
     }
 
     public List<EmployeeMovieDto> getAllByClient(String email) {
-        return movieRepository.findAllByClient(clientService.getByEmail(email).orElse(null)).stream().map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto).toList();
+        return movieRepository.findAllByClient(clientService.getByEmail(email)).stream().map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto).toList();
     }
 
     /**
@@ -41,7 +41,7 @@ public class MovieService implements ServiceInterface {
      * @return list of movies
      * */
     public List<ClientMovieDto> getAllMovies(String email) {
-        return movieRepository.findAllByClient(clientService.getByEmail(email).orElse(null))
+        return movieRepository.findAllByClient(clientService.getByEmail(email))
                 .stream()
                 .map(MovieMapper.INSTANCE::fromMovieToDto)
                 .toList();
@@ -55,7 +55,7 @@ public class MovieService implements ServiceInterface {
     public DtoInterface addMovie(String email, CreateMovieDto createMovieDto) {
         if (email != null && createMovieDto != null){
             Movie movie = MovieMapper.INSTANCE.fromDtoToMovie(createMovieDto);
-            Client client = clientService.getByEmail(email).orElse(null);
+            Client client = clientService.getByEmail(email);
             if (client != null) {
                 movie.setClient(client);
                 return MovieMapper.INSTANCE.fromMovieToDto(movieRepository.save(movie));

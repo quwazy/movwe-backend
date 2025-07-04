@@ -33,8 +33,8 @@ public class ClientService implements ServiceInterface {
     }
 
     @Cacheable(value = "client", key = "#email", unless = "#result == null")
-    public Optional<Client> getByEmail(String email) {
-        return clientRepository.findByEmail(email);
+    public Client getByEmail(String email) {
+        return clientRepository.findByEmail(email).orElse(null);
     }
 
     public Optional<ClientDto> getByUsername(String username) {
@@ -71,7 +71,6 @@ public class ClientService implements ServiceInterface {
     }
 
     @CacheEvict(value = "clients", allEntries = true)
-    @CachePut(value = "client", key = "#result.email", condition = "#createClientDto != null", unless = "#result == null")
     public ClientDto addClient(CreateClientDto createClientDto) {
         if (createClientDto != null){
             Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
