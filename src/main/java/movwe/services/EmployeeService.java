@@ -46,13 +46,27 @@ public class EmployeeService implements ServiceInterface {
     }
 
     @Override
-    @CacheEvict(value = "employees", allEntries = true)
-    @CachePut(value = "employee", key = "#result.email", condition = "#dto != null", unless = "#result == null")
+    @SuppressWarnings("do not use, conflict with caching")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateEmployeeDto createEmployeeDto && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
             Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
             employee.setPassword(passwordEncoder.encode(createEmployeeDto.getPassword()));
             employee.setRole(Role.valueOf(createEmployeeDto.getRole()));
+            return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.save(employee));
+        }
+        return null;
+    }
+
+    @CacheEvict(value = "employees", allEntries = true)
+    @CachePut(value = "employee", key = "#result.email", condition = "#createEmployeeDto != null", unless = "#result == null")
+    public EmployeeDto addEmployee(CreateEmployeeDto createEmployeeDto) {
+        if (createEmployeeDto != null && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
+            Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
+            employee.setPassword(passwordEncoder.encode(createEmployeeDto.getPassword()));
+            employee.setRole(Role.valueOf(createEmployeeDto.getRole()));
+            if (employee.getRole().equals(Role.ADMIN)) {
+                return null;
+            }
             return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.save(employee));
         }
         return null;

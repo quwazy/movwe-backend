@@ -64,7 +64,7 @@ public class EmployeeController {
     @Operation(summary = "Add new employee")
     public ResponseEntity<?> addEmployee(@Valid @RequestBody CreateEmployeeDto createEmployeeDto) {
         try {
-            if (employeeService.add(createEmployeeDto) != null){
+            if (employeeService.addEmployee(createEmployeeDto) != null){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().build();

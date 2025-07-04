@@ -60,7 +60,7 @@ public class ClientService implements ServiceInterface {
     }
 
     @Override
-    @SuppressWarnings("do not use, problem with caching")
+    @SuppressWarnings("do not use, conflict with caching")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateClientDto createClientDto){
             Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
