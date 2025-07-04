@@ -64,10 +64,10 @@ public class ClientController {
     @Operation(summary = "Add new client")
     public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto){
         try {
-            if (clientService.add(createClientDto) != null){
+            if (clientService.addClient(createClientDto) != null){
                 return ResponseEntity.ok().build();
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Something went wrong with adding client");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }

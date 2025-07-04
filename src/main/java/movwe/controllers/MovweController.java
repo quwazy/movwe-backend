@@ -43,11 +43,11 @@ public class MovweController {
     @Operation(summary = "Client adds new movie on his list")
     public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String token, @RequestBody CreateMovieDto createMovieDto) {
         try {
-            if (movieService.addMovie(extractEmailFromJwt(token),createMovieDto) != null) {
+            if (movieService.addMovie(extractEmailFromJwt(token), createMovieDto) != null) {
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with adding movie to client's list");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
@@ -87,6 +87,11 @@ public class MovweController {
         }
     }
 
+    /**
+     * Extract email from jwt token
+     * @param jwt token
+     * @return email from jwt as String
+     */
     private String extractEmailFromJwt(String jwt) {
         return jwtService.extractEmail(jwt.substring(7));
     }

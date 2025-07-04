@@ -2,7 +2,9 @@ package movwe.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import movwe.domains.clients.dtos.CreateClientDto;
 import movwe.domains.mongos.LoginRequest;
+import movwe.services.ClientService;
 import movwe.services.authServices.JwtService;
 import movwe.services.mongoServices.LoginRequestService;
 import movwe.utils.dtos.JwtDto;
@@ -23,6 +25,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final LoginRequestService loginRequestService;
+    private final ClientService clientService;
 
     @PostMapping(path = "/employee",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -38,6 +41,19 @@ public class AuthController {
     @Operation(summary = "Login client")
     public ResponseEntity<?> loginClient(@RequestBody LoginDto loginDto) {
         return getResponseEntity(loginDto, "/client");
+    }
+
+    @PostMapping(path = "/addClient", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add new client")
+    public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto) {
+        try {
+            if (clientService.addClient(createClientDto) != null) {
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.badRequest().body("Something went wrong with adding client");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     /**
@@ -59,8 +75,8 @@ public class AuthController {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginDto.getEmail(),
-                    loginDto.getPassword()));
-
+                    loginDto.getPassword())
+            );
             SecurityContext securityContext = SecurityContextHolder.getContext();
             securityContext.setAuthentication(authentication);
         } catch (Exception e) {

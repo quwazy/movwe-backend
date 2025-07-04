@@ -60,10 +60,20 @@ public class ClientService implements ServiceInterface {
     }
 
     @Override
-    @CacheEvict(value = "clients", allEntries = true)
-    @CachePut(value = "client", key = "result.email", condition = "#dto != null", unless = "#result == null")
+    @SuppressWarnings("do not use, problem with caching")
     public DtoInterface add(DtoInterface dto) {
         if (dto instanceof CreateClientDto createClientDto){
+            Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
+            client.setPassword(passwordEncoder.encode(createClientDto.getPassword()));
+            return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
+        }
+        return null;
+    }
+
+    @CacheEvict(value = "clients", allEntries = true)
+    @CachePut(value = "client", key = "#result.email", condition = "#createClientDto != null", unless = "#result == null")
+    public ClientDto addClient(CreateClientDto createClientDto) {
+        if (createClientDto != null){
             Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
             client.setPassword(passwordEncoder.encode(createClientDto.getPassword()));
             return ClientMapper.INSTANCE.fromClientToDto(clientRepository.save(client));
