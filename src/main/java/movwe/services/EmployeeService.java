@@ -18,22 +18,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class EmployeeService implements ServiceInterface {
-    private EmployeeRepository employeeRepository;
+public class EmployeeService implements ServiceInterface<Employee> {
+    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Optional<DtoInterface> get(Long id) {
-        return employeeRepository.findById(id).map(EmployeeMapper.INSTANCE::fromEmployeeToDto);
+    public Employee getById(Long id) {
+        return employeeRepository.findById(id).orElse(null);
     }
 
+    @Override
     @Cacheable(value = "employee", key = "#email", unless = "#result == null")
-    public Optional<Employee> getByEmail(String email) {
-        return employeeRepository.findByEmail(email);
+    public Employee getByEmail(String email) {
+        return employeeRepository.findByEmail(email).orElse(null);
     }
 
     @Override
@@ -46,35 +46,44 @@ public class EmployeeService implements ServiceInterface {
     }
 
     @Override
-    @SuppressWarnings("do not use, conflict with caching")
-    public DtoInterface add(DtoInterface dto) {
-        if (dto instanceof CreateEmployeeDto createEmployeeDto && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
-            Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
-            employee.setPassword(passwordEncoder.encode(createEmployeeDto.getPassword()));
-            employee.setRole(Role.valueOf(createEmployeeDto.getRole()));
-            return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.save(employee));
-        }
-        return null;
-    }
-
     @CacheEvict(value = "employees", allEntries = true)
-    @CachePut(value = "employee", key = "#result.email", condition = "#createEmployeeDto != null", unless = "#result == null")
-    public EmployeeDto addEmployee(CreateEmployeeDto createEmployeeDto) {
-        if (createEmployeeDto != null && createEmployeeDto.getRole() != null && !createEmployeeDto.getRole().equalsIgnoreCase("ADMIN")) {
+    @CachePut(value = "employee", key = "#result.email", unless = "#result == null")
+    public Employee create(DtoInterface dto){
+        if (dto instanceof CreateEmployeeDto createEmployeeDto){
             Employee employee = EmployeeMapper.INSTANCE.fromDtoToEmployee(createEmployeeDto);
-            employee.setPassword(passwordEncoder.encode(createEmployeeDto.getPassword()));
             employee.setRole(Role.valueOf(createEmployeeDto.getRole()));
             if (employee.getRole().equals(Role.ADMIN)) {
                 return null;
             }
-            return EmployeeMapper.INSTANCE.fromEmployeeToDto(employeeRepository.save(employee));
+            employee.setPassword(passwordEncoder.encode(createEmployeeDto.getPassword()));
+            return employeeRepository.save(employee);
         }
         return null;
     }
 
     @Override
-    public DtoInterface update(Long id, DtoInterface dto) {
+    @Caching(evict = {
+            @CacheEvict(value = "employee", key = "#result.email"),
+            @CacheEvict(value = "employees", allEntries = true)
+    })
+    @CachePut(value = "employee", key = "#result.email", unless = "#result == null")
+    public Employee update(DtoInterface dto) {
         return null;
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "employee", key = "#email"),
+            @CacheEvict(value = "employees", allEntries = true),
+            @CacheEvict(value = "userByEmail", key = "#email")
+    })
+    @CachePut(value = "employee", key = "#result.email", unless = "#result == null")
+    public Employee updateActivity(String email) {
+        return employeeRepository.findByEmail(email)
+                .map(employee -> {
+                    employee.setActive(!employee.isActive());
+                    return employeeRepository.save(employee);
+                })
+                .orElse(null);
     }
 
     @Override
@@ -83,17 +92,18 @@ public class EmployeeService implements ServiceInterface {
             @CacheEvict(value = "employees", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true)
     })
-    public void delete(Long id) {
-        employeeRepository.deleteById(id);
+    public boolean deleteById(Long id) {
+        return employeeRepository.deleteByIdCustom(id) == 1;
     }
 
+    @Override
     @Caching(evict = {
             @CacheEvict(value = "employee", key = "#email"),
             @CacheEvict(value = "employees", allEntries = true),
             @CacheEvict(value = "userByEmail", key = "#email")
     })
-    public void deleteByEmail(String email){
-        employeeRepository.deleteByEmail(email);
+    public boolean deleteByEmail(String email){
+        return employeeRepository.deleteByEmail(email) == 1;
     }
 
     @Override

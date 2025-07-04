@@ -15,8 +15,8 @@ import java.util.Optional;
 @Component
 @AllArgsConstructor
 public class DataConfig implements CommandLineRunner {
-    private ClientRepository clientRepository;
-    private EmployeeRepository employeeRepository;
+    private final ClientRepository clientRepository;
+    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override

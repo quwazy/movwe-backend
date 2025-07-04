@@ -11,11 +11,16 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+
     Optional<Employee> findByEmail(String email);
 
     @Modifying
+    @Query("DELETE FROM Employee e WHERE e.id = :id")
+    int deleteByIdCustom(@Param("id") Long id);
+
+    @Modifying
     @Query("DELETE FROM Employee e WHERE e.email = :email AND e.role <> 'ADMIN'")
-    void deleteByEmail(@Param("email") String email);
+    int deleteByEmail(@Param("email") String email);
 
     @Modifying
     @Query("DELETE FROM Employee e WHERE  e.role <> 'ADMIN'")

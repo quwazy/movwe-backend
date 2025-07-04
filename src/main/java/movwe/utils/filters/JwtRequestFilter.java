@@ -29,7 +29,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String token = null;
         String email = null;
 
-        if (request.getRequestURL().toString().contains("/api/")){
+        if (request.getRequestURL().toString().contains("/api/")) {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
                 try {
@@ -50,7 +50,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 } catch (IllegalArgumentException e) {
                     throw new RuntimeException(e);
                 } catch (TokenExpiredException e) {
-//                    logger.warn("JWT token is expired");
+                    logger.warn("JWT token is expired");
                 }
             } else {
                 logger.warn("JWT token is missing in request header");

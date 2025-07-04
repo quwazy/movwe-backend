@@ -7,6 +7,8 @@ import movwe.utils.interfaces.DtoInterface;
 @Data
 @Schema(description = "Represents new movie for one client")
 public class CreateMovieDto implements DtoInterface {
+    @Schema(description = "Email of client")
+    private String email;
     @Schema(description = "Movie title")
     private String title;
     @Schema(description = "Your description of the movie")

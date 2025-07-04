@@ -1,53 +1,53 @@
 package movwe.utils.interfaces;
 
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * Represents an interface that should
- * be implemented by every @RestController
- * class.
- * Contains methods for CRUD operations.
+ * Determines which methods every
+ * @Controller class must implement.
  */
 public interface ControllerInterface {
-    /**
-     * Get one entity bt its id
-     * @param id of entity
-     * @return Entity as JSON object or BadRequest
-     */
-    ResponseEntity<?> get(Long id);
+    /// Sve metode vracaju ResponseEntity<?>
+    /// U sebi imaju try/cache blok i u cache
+    /// bloku vracaju Bad Request sa porukom iz Exceptiona
+    /// Controller klase pakuju entitete u dto-ove
+    /// Imena metoda da budu opisna i da pocinju sa get, create, update, delete
+    /// Operation anotacija da ide na vrh, a Mapping da ide odmah iznad metode
 
-    /**
-     * Get all entities in the database table
-     * @return All entities as JSON objects
-     */
+    @Operation(summary = "Get entity by id")
+    @GetMapping(path = "/getById/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getById(@PathVariable Long id);
+
+    @Operation(summary = "Get entity by email")
+    @GetMapping(path = "/getByEmail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> getByEmail(@PathVariable String email);
+
+    @Operation(summary = "Get all entities")
+    @GetMapping(path = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> getAll();
 
-    /**
-     * Add new entity
-     * @param dto New entity as JSON
-     * @return 200 OK if saving was successful
-     */
-    ResponseEntity<?> add(DtoInterface dto);
+    @Operation(summary = "Create new entity")
+    @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> create(@RequestBody DtoInterface dto);
 
-    /**
-     * Update entity by its id
-     * @param id of entity
-     * @param dto new entity as dto
-     * @return 200 OK if updating was successful
-     */
-    ResponseEntity<?> update(Long id, DtoInterface dto);
+    @Operation(summary = "Update entity")
+    @PutMapping(path = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> update(@RequestBody DtoInterface dto);
 
-    /**
-     * Delete one entity in a database by its id
-     * @param id of entity
-     * @return 200 OK if deleting was successful
-     */
-    ResponseEntity<?> delete(Long id);
+    @Operation(summary = "Delete entity by id")
+    @DeleteMapping(path = "/deleteById/{id}")
+    ResponseEntity<?> deleteById(@PathVariable Long id);
 
-    /**
-     * Empty database table
-     * Could be used only by Role = ADMIN users
-     * @return 200 OK if deleting was successful
-     */
+    @Operation(summary = "Delete entity by email")
+    @DeleteMapping(path = "/deleteByEmail/{email}")
+    ResponseEntity<?> deleteByEmail(@PathVariable String email);
+
+    @Operation(summary = "Delete all entities")
+    @DeleteMapping(path = "/deleteAll")
+    @PreAuthorize( "hasRole('ADMIN')")
     ResponseEntity<?> deleteAll();
 }

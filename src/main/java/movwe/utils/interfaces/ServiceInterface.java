@@ -1,51 +1,78 @@
 package movwe.utils.interfaces;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Represents an interface that should
- * be implemented by every @Service
- * class.
- * Contains methods for CRUD operations.
+ * Determines which methods every
+ * @Service class must implement.
+ * <T> represents entity class
+ * in a database.
  */
-public interface ServiceInterface {
+public interface ServiceInterface<T> {
+    /// Nema Optional, vec sve metode vracaju null ako nesto nije dobro
+    /// Metode vracaju cele entitete
+    /// Imena metoda da budu opisna i da pocinju sa get, create, update, delete
+    /// Pomocne metode da budu private i obavezno da imaju dokumentaciju
+    /// U servisu se kesiraju povratne vrednosti metoda
+
     /**
-     * Get one entity by its id
+     * Get entity by its id
      * @param id of entity
-     * @return T as Object
+     * @return entity or null
      */
-    Optional<DtoInterface> get(Long id);
+    T getById(Long id);
+
+    /**
+     * Get entity by its email
+     * Cacheable annotation
+     * @param email of entity
+     * @return entity or null
+     */
+    T getByEmail(String email);
 
     /**
      * Get all entities in the database table
-     * @return T as List of Objects
+     * Cacheable annotation
+     * @return all entities as DTOs or empty array
      */
     List<?> getAll();
 
     /**
-     * Insert entity into database table
-     * @param dto new entity as dto
-     * @return new entity
+     * Crete entity
+     * CacheEvict & CachePut annotation
+     * @param dto represents a new entity
+     * @return created entity or null
      */
-    DtoInterface add(DtoInterface dto);
+    T create(DtoInterface dto);
 
     /**
-     * Update one entity
-     * @param id of entity in the database table
-     * @param dto with new values
-     * @return updated entity
+     * Update an existing entity
+     * CacheEvict & CachePut annotation
+     * @param dto represents an updated entity
+     * @return updated entity or null
      */
-    DtoInterface update(Long id, DtoInterface dto);
+    T update(DtoInterface dto);
 
     /**
-     * Delete one entity in a table
+     * Delete entity by its id
+     * CacheEvict annotation
      * @param id of entity
+     * @return was operation successful
      */
-    void delete(Long id);
+    boolean deleteById(Long id);
 
     /**
-     * Empty the whole database table
+     * Delete entity by its email
+     * Must have @CacheEvict
+     * @param email of entity
+     * @return was operation successful
+     */
+    boolean deleteByEmail(String email);
+
+    /**
+     * Delete all entities in the database table
+     * Must have @CacheEvict and @Transactional
+     * ADMIN only
      */
     void deleteAll();
 }

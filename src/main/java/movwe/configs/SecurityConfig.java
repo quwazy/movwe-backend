@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @AllArgsConstructor
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)     //enable @PreAuthorize annotation
+@EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig {
     private final JwtRequestFilter JwtRequestFilter;
 
@@ -30,12 +30,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/*.html", "/css/**", "/js/**", "/images/**").permitAll()  //static HTML has no auth
-                        .requestMatchers("/swagger-ui/**").permitAll()  //swagger
-                        .requestMatchers("/v3/api-docs/**").permitAll() //swagger
-                        .requestMatchers("/auth/**").permitAll()        //login
+                        .requestMatchers("/*.html", "/css/**", "/js/**", "/images/**").permitAll()  //static HTML
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()               //swagger
+                        .requestMatchers("/auth/**").permitAll()                        //login and sign in
                         .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()     //allows OPTIONS header for all routes
-                        .anyRequest().authenticated()                                  //for everything else, you must be authenticated
+                        .anyRequest().authenticated()                                     //for everything else, you must be authenticated
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(JwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

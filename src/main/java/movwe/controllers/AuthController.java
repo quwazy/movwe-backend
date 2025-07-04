@@ -43,11 +43,11 @@ public class AuthController {
         return getResponseEntity(loginDto, "/client");
     }
 
-    @PostMapping(path = "/addClient", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Add new client")
-    public ResponseEntity<?> addClient(@RequestBody CreateClientDto createClientDto) {
+    @PostMapping(path = "/createClient", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Sign in client")
+    public ResponseEntity<?> createClient(@RequestBody CreateClientDto createClientDto) {
         try {
-            if (clientService.addClient(createClientDto) != null) {
+            if (clientService.create(createClientDto) != null) {
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with adding client");
@@ -81,12 +81,12 @@ public class AuthController {
             securityContext.setAuthentication(authentication);
         } catch (Exception e) {
             loginRequest.setSuccessful(false);
-            loginRequestService.save(loginRequest);
+            loginRequestService.create(loginRequest);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
         loginRequest.setSuccessful(true);
-        loginRequestService.save(loginRequest);
+        loginRequestService.create(loginRequest);
         return ResponseEntity.ok(new JwtDto(jwtService.generateToken(loginDto.getEmail())));
     }
 }

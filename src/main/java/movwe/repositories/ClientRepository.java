@@ -11,11 +11,16 @@ import java.util.Optional;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
+
     Optional<Client> findByEmail(String email);
 
     Optional<Client> findByUsername(String username);
 
     @Modifying
+    @Query("DELETE FROM Client c WHERE c.id = :id")
+    int deleteByIdCustom(@Param("id") Long id);
+
+    @Modifying
     @Query("DELETE FROM Client c WHERE c.email = :email")
-    void deleteByEmail(@Param("email") String email);
+    int deleteByEmail(@Param("email") String email);
 }
