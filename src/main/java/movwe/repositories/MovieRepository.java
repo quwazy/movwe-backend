@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
    List<Movie> findAllByClient(Client client);
 
-    void deleteAllByClient_Email(String clientEmail);
+   void deleteAllByClient_Email(String clientEmail);
 }

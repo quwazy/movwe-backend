@@ -2,7 +2,6 @@ package movwe.repositories;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import movwe.domains.employees.entities.Employee;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    @Cacheable(value = "employee", key = "#email", unless = "#result == null")
     Optional<Employee> findByEmail(String email);
 
     @Modifying
