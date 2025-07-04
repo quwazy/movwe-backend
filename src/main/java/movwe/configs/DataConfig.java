@@ -35,7 +35,7 @@ public class DataConfig implements CommandLineRunner {
         }
 
         Optional<Employee> editorEmployee = employeeRepository.findByEmail("ogi@gmail.com");
-        if (adminEmployee.isEmpty()) {
+        if (editorEmployee.isEmpty()) {
             Employee employee = new Employee();
             employee.setRole(Role.EDITOR);
             employee.setEmail("ogi@gmail.com");
