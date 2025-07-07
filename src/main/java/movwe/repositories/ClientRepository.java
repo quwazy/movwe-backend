@@ -2,6 +2,7 @@ package movwe.repositories;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import movwe.domains.clients.entities.Client;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
+    @EntityGraph(attributePaths = {"friends"})
     Optional<Client> findByEmail(String email);
 
     Optional<Client> findByUsername(String username);
