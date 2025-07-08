@@ -66,11 +66,21 @@ public class MovweController {
         }
     }
 
+    @Operation(summary = "Search for new friends by username")
+    @GetMapping(path = "/searchFriend/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchFriend(@RequestHeader("Authorization") String token, @PathVariable String username){
+        try {
+            return ResponseEntity.ok(friendService.searchFriend(extractEmailFromJwt(token), username));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @Operation(summary = "Add friend on friend list")
     @PostMapping(path = "/addFriend", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
         try {
-            if (!friendService.addFriend(extractEmailFromJwt(token), friendDto.getUsername()).isEmpty()){
+            if (!friendService.addFriend(extractEmailFromJwt(token), friendDto.getEmail()).isEmpty()){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with adding friend to friend list");
@@ -83,7 +93,7 @@ public class MovweController {
     @DeleteMapping(path = "/removeFriend", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
         try {
-            if (friendService.removeFriend(extractEmailFromJwt(token),friendDto.getUsername())){
+            if (friendService.removeFriend(extractEmailFromJwt(token),friendDto.getEmail())){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with removing friend from friend list");

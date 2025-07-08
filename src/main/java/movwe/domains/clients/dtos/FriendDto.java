@@ -7,5 +7,6 @@ import movwe.utils.interfaces.DtoInterface;
 @Data
 @Schema(description = "Represents friend from fried list")
 public class FriendDto implements DtoInterface {
+    private String email;
     private String username;
 }

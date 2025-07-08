@@ -7,6 +7,7 @@ import movwe.domains.clients.mappers.ClientMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -25,11 +26,20 @@ public class FriendService {
                 .toList();
     }
 
-    @CacheEvict(value = "friends", key = "#email")
+    public List<FriendDto> searchFriend(String email, String search) {
+        return clientService.searchClients(search).stream()
+                .filter(friendDto -> !friendDto.getEmail().equals(email))
+                .toList();
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "client", key = "#email"),
+            @CacheEvict(value = "friends", key = "#email")
+    })
     @CachePut(value = "friends", key = "#email", unless = "#result == null")
-    public List<FriendDto> addFriend(String email, String friendUsername) {
+    public List<FriendDto> addFriend(String email, String friendEmail) {
         Client client = clientService.getByEmail(email);
-        Client friend = clientService.getByUsername(friendUsername);
+        Client friend = clientService.getByEmail(friendEmail);
 
         if (client != null && friend != null) {
             client.getFriends().add(friend);
@@ -42,10 +52,13 @@ public class FriendService {
         }
     }
 
-    @CacheEvict(value = "friends", key = "#email")
-    public boolean removeFriend(String email, String friendUsername) {
+    @Caching(evict = {
+            @CacheEvict(value = "client", key = "#email"),
+            @CacheEvict(value = "friends", key = "#email")
+    })
+    public boolean removeFriend(String email, String friendEmail) {
         Client client = clientService.getByEmail(email);
-        Client friend = clientService.getByUsername(friendUsername);
+        Client friend = clientService.getByEmail(friendEmail);
 
         if (client != null && friend != null) {
             client.getFriends().remove(friend);

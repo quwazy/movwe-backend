@@ -3,6 +3,7 @@ package movwe.services;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.ClientDto;
 import movwe.domains.clients.dtos.CreateClientDto;
+import movwe.domains.clients.dtos.FriendDto;
 import movwe.domains.clients.entities.Client;
 import movwe.domains.clients.mappers.ClientMapper;
 import movwe.repositories.ClientRepository;
@@ -12,10 +13,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -28,6 +31,18 @@ public class ClientService implements ServiceInterface<Client> {
         return clientRepository.save(client);
     }
 
+    /**
+     * Searching Clients by username
+     * return: six clients with matching username
+     */
+    public List<FriendDto> searchClients(String username){
+        return clientRepository.findClientsByUsernameStartingWith(username, PageRequest.of(0, 6))
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(ClientMapper.INSTANCE::fromClientToFriendDto)
+                .toList();
+    }
+
     @Override
     public Client getById(Long id) {
         return clientRepository.findById(id).orElse(null);
@@ -37,10 +52,6 @@ public class ClientService implements ServiceInterface<Client> {
     @Cacheable(value = "client", key = "#email", unless = "#result == null")
     public Client getByEmail(String email) {
         return clientRepository.findByEmail(email).orElse(null);
-    }
-
-    public Client getByUsername(String username) {
-        return clientRepository.findByUsername(username).orElse(null);
     }
 
     @Override
