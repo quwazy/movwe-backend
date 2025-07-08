@@ -18,6 +18,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     @EntityGraph(attributePaths = {"friends", "movies"})
     Optional<Client> findByEmail(String email);
 
+    Optional<Client> findByUsername(String username);
+
     Optional<List<Client>> findClientsByUsernameStartingWith(String username, Pageable pageable);
 
     @Modifying

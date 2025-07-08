@@ -54,6 +54,10 @@ public class ClientService implements ServiceInterface<Client> {
         return clientRepository.findByEmail(email).orElse(null);
     }
 
+    public Client getByUsername(String username) {
+        return clientRepository.findByUsername(username).orElse(null);
+    }
+
     @Override
     @Cacheable(value = "clients")
     public List<ClientDto> getAll() {

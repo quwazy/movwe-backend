@@ -3,6 +3,7 @@ package movwe.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import movwe.domains.clients.dtos.FriendDto;
+import movwe.domains.clients.entities.Client;
 import movwe.domains.movies.dtos.CreateMovieDto;
 import movwe.services.FriendService;
 import movwe.services.MovieService;
@@ -24,6 +25,20 @@ public class MovweController {
     public ResponseEntity<?> getAllMovies(@RequestHeader("Authorization") String token) {
         try {
             return ResponseEntity.ok(movieService.getAllMoviesFromClient(extractEmailFromJwt(token)));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Get all movies from friend or other client")
+    @GetMapping(path = "/getAllFriendsMovies/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllFriendsMovies(@RequestHeader("Authorization") String token, @PathVariable String username) {
+        try {
+            Client client = friendService.getByUsername(username);
+            if (client != null) {
+                return ResponseEntity.ok(movieService.getAllMoviesFromClient(client.getEmail()));
+            }
+            return ResponseEntity.badRequest().body("Something went wrong with getting movies from other client");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

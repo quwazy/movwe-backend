@@ -18,6 +18,10 @@ import java.util.List;
 public class FriendService {
     private final ClientService clientService;
 
+    public Client getByUsername(String username) {
+        return clientService.getByUsername(username);
+    }
+
     @Cacheable(value = "friends", key = "#email")
     public List<FriendDto> getFriendList(String email) {
         return clientService.getByEmail(email).getFriends()
