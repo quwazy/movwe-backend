@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-   Optional<List<Movie>> findAllByClient(Client client);
+   Optional<List<Movie>> findAllByClientOrderByCreationDateDesc(Client client);
 
    int deleteAllByClient_Email(String clientEmail);
 

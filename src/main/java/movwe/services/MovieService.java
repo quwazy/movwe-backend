@@ -24,7 +24,7 @@ public class MovieService implements ServiceInterface<Movie> {
     private final ClientService clientService;
 
     public List<ClientMovieDto> getAllMoviesFromClient(String email) {
-        return movieRepository.findAllByClient(clientService.getByEmail(email))
+        return movieRepository.findAllByClientOrderByCreationDateDesc(clientService.getByEmail(email))
                 .orElseGet(Collections::emptyList)
                 .stream()
                 .map(MovieMapper.INSTANCE::fromMovieToDto)
@@ -52,7 +52,7 @@ public class MovieService implements ServiceInterface<Movie> {
     }
 
     public List<EmployeeMovieDto> getAllByEmail(String email) {
-        return movieRepository.findAllByClient(clientService.getByEmail(email))
+        return movieRepository.findAllByClientOrderByCreationDateDesc(clientService.getByEmail(email))
                 .orElseGet(Collections::emptyList)
                 .stream()
                 .map(MovieMapper.INSTANCE::fromMovieToEmployeeMovieDto)
