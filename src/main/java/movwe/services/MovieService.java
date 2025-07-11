@@ -10,6 +10,8 @@ import movwe.domains.movies.mappers.MovieMapper;
 import movwe.repositories.MovieRepository;
 import movwe.utils.interfaces.DtoInterface;
 import movwe.utils.interfaces.ServiceInterface;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class MovieService implements ServiceInterface<Movie> {
     private final MovieRepository movieRepository;
     private final ClientService clientService;
 
+    @Cacheable(value = "movies", key = "#email")
     public List<ClientMovieDto> getAllMoviesFromClient(String email) {
         return movieRepository.findAllByClientOrderByCreationDateDesc(clientService.getByEmail(email))
                 .orElseGet(Collections::emptyList)
@@ -31,7 +34,8 @@ public class MovieService implements ServiceInterface<Movie> {
                 .collect(Collectors.toList());
     }
 
-    public boolean deleteClientMovies(Long id, String email) {
+    @CacheEvict(value = "movies", key = "#email")
+    public boolean deleteClientMovie(Long id, String email) {
         Movie movie = movieRepository.findById(id).orElse(null);
         if (movie != null && movie.getClient().getEmail().equals(email)) {
             movieRepository.deleteById(id);
@@ -68,6 +72,7 @@ public class MovieService implements ServiceInterface<Movie> {
     }
 
     @Override
+    @CacheEvict(value = "movies", key = "#result.client.email")
     public Movie create(DtoInterface dto) {
         if (dto instanceof CreateMovieDto createMovieDto && createMovieDto.getEmail() != null){
             Movie movie = MovieMapper.INSTANCE.fromDtoToMovie(createMovieDto);
@@ -87,17 +92,20 @@ public class MovieService implements ServiceInterface<Movie> {
     }
 
     @Override
+    @CacheEvict(value = "movies", allEntries = true)
     public boolean deleteById(Long id) {
         return movieRepository.deleteByIdCustom(id) == 1;
     }
 
     @Override
+    @CacheEvict(value = "movies", key = "#email")
     public boolean deleteByEmail(String email) {
         return movieRepository.deleteAllByClient_Email(email) >= 1;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "movies", allEntries = true)
     public void deleteAll() {
         movieRepository.deleteAll();
     }

@@ -66,7 +66,7 @@ public class MovieController implements ControllerInterface {
     }
 
     @Override
-    public ResponseEntity<?> deleteById(Long id) {
+    public ResponseEntity<?> deleteById(@PathVariable Long id) {
         try {
             if (movieService.deleteById(id)){
                 return ResponseEntity.ok().build();

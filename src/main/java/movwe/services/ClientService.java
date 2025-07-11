@@ -31,10 +31,7 @@ public class ClientService implements ServiceInterface<Client> {
         return clientRepository.save(client);
     }
 
-    /**
-     * Searching Clients by username
-     * return: six clients with matching username
-     */
+    /// Searching Clients by username
     public List<FriendDto> searchClients(String username){
         return clientRepository.findClientsByUsernameStartingWith(username, PageRequest.of(0, 6))
                 .orElseGet(Collections::emptyList)
@@ -49,7 +46,6 @@ public class ClientService implements ServiceInterface<Client> {
     }
 
     @Override
-    @Cacheable(value = "client", key = "#email", unless = "#result == null")
     public Client getByEmail(String email) {
         return clientRepository.findByEmail(email).orElse(null);
     }
@@ -69,7 +65,6 @@ public class ClientService implements ServiceInterface<Client> {
 
     @Override
     @CacheEvict(value = "clients", allEntries = true)
-    @CachePut(value = "client", key = "#result.email", unless = "#result == null")
     public Client create(DtoInterface dto){
         if (dto instanceof CreateClientDto createClientDto){
             Client client = ClientMapper.INSTANCE.fromDtoToClient(createClientDto);
@@ -80,21 +75,15 @@ public class ClientService implements ServiceInterface<Client> {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "client", key = "#result.email"),
-            @CacheEvict(value = "clients", allEntries = true)
-    })
-    @CachePut(value = "client", key = "#result.email", unless = "#result == null")
+    @CacheEvict(value = "clients", allEntries = true)
     public Client update(DtoInterface dto) {
         return null;
     }
 
     @Caching(evict = {
-            @CacheEvict(value = "client", key = "#email"),
             @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", key = "#email")
     })
-    @CachePut(value = "client", key = "#email", unless = "#result == null")
     public Client updateActivity(String email) {
         return clientRepository.findByEmail(email)
                 .map(client -> {
@@ -106,7 +95,6 @@ public class ClientService implements ServiceInterface<Client> {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "client", allEntries = true),
             @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true),
             @CacheEvict(value = "friends", allEntries = true)
@@ -117,7 +105,6 @@ public class ClientService implements ServiceInterface<Client> {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "client", key = "#email"),
             @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", key = "#email"),
             @CacheEvict(value = "friends", key = "#email")
@@ -129,7 +116,6 @@ public class ClientService implements ServiceInterface<Client> {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "client", allEntries = true),
             @CacheEvict(value = "clients", allEntries = true),
             @CacheEvict(value = "userByEmail", allEntries = true),
             @CacheEvict(value = "friends", allEntries = true)

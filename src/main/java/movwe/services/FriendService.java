@@ -7,7 +7,6 @@ import movwe.domains.clients.mappers.ClientMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -30,16 +29,13 @@ public class FriendService {
                 .toList();
     }
 
-    public List<FriendDto> searchFriend(String email, String search) {
+    public List<FriendDto> searchClients(String email, String search) {
         return clientService.searchClients(search).stream()
                 .filter(friendDto -> !friendDto.getEmail().equals(email))
                 .toList();
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "client", key = "#email"),
-            @CacheEvict(value = "friends", key = "#email")
-    })
+    @CacheEvict(value = "friends", key = "#email")
     @CachePut(value = "friends", key = "#email", unless = "#result == null")
     public List<FriendDto> addFriend(String email, String friendEmail) {
         Client client = clientService.getByEmail(email);
@@ -56,10 +52,7 @@ public class FriendService {
         }
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "client", key = "#email"),
-            @CacheEvict(value = "friends", key = "#email")
-    })
+    @CacheEvict(value = "friends", key = "#email")
     public boolean removeFriend(String email, String friendEmail) {
         Client client = clientService.getByEmail(email);
         Client friend = clientService.getByEmail(friendEmail);

@@ -62,7 +62,7 @@ public class MovweController {
     @DeleteMapping(path = "/deleteMovie/{id}")
     public ResponseEntity<?> deleteMovie(@RequestHeader("Authorization") String token, @PathVariable Long id){
         try {
-            if (movieService.deleteClientMovies(id, extractEmailFromJwt(token))){
+            if (movieService.deleteClientMovie(id, extractEmailFromJwt(token))){
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body("Something went wrong with deleting movie from client's list");
@@ -85,7 +85,7 @@ public class MovweController {
     @GetMapping(path = "/searchFriend/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchFriend(@RequestHeader("Authorization") String token, @PathVariable String username){
         try {
-            return ResponseEntity.ok(friendService.searchFriend(extractEmailFromJwt(token), username));
+            return ResponseEntity.ok(friendService.searchClients(extractEmailFromJwt(token), username));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
