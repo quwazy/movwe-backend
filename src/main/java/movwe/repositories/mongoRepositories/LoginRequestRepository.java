@@ -1,6 +1,6 @@
 package movwe.repositories.mongoRepositories;
 
-import movwe.domains.mongos.LoginRequest;
+import movwe.domains.mongoEntities.LoginRequest;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

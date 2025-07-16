@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface ServiceInterface<T> {
     /// Nema Optional, vec sve metode vracaju null ako nesto nije dobro
-    /// Metode vracaju cele entitete
+    /// Metode vracaju DTO ili cele entitete ako treba
     /// Imena metoda da budu opisna i da pocinju sa get, create, update, delete
     /// Pomocne metode da budu private i obavezno da imaju dokumentaciju
     /// U servisu se kesiraju povratne vrednosti metoda
@@ -23,23 +23,13 @@ public interface ServiceInterface<T> {
     T getById(Long id);
 
     /**
-     * Get entity by its email
-     * Cacheable annotation
-     * @param email of entity
-     * @return entity or null
-     */
-    T getByEmail(String email);
-
-    /**
      * Get all entities in the database table
-     * Cacheable annotation
      * @return all entities as DTOs or empty array
      */
     List<?> getAll();
 
     /**
      * Crete entity
-     * CacheEvict & CachePut annotation
      * @param dto represents a new entity
      * @return created entity or null
      */
@@ -47,7 +37,6 @@ public interface ServiceInterface<T> {
 
     /**
      * Update an existing entity
-     * CacheEvict & CachePut annotation
      * @param dto represents an updated entity
      * @return updated entity or null
      */
@@ -55,23 +44,14 @@ public interface ServiceInterface<T> {
 
     /**
      * Delete entity by its id
-     * CacheEvict annotation
      * @param id of entity
-     * @return was operation successful
+     * @return operation success
      */
     boolean deleteById(Long id);
 
     /**
-     * Delete entity by its email
-     * Must have @CacheEvict
-     * @param email of entity
-     * @return was operation successful
-     */
-    boolean deleteByEmail(String email);
-
-    /**
      * Delete all entities in the database table
-     * Must have @CacheEvict and @Transactional
+     * Must have @Transactional
      * ADMIN only
      */
     void deleteAll();

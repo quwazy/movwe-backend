@@ -16,9 +16,10 @@ public class JwtService implements Serializable {
     private final long EXPIRATION_TIME = 1000 * 60 * 1000;    //1000 minutes
 
     /// Generate a JWT token
-    public String generateToken(String email) {
+    public String generateToken(String email, String username) {
         return JWT.create()
                 .withSubject(email)
+                .withClaim("username", username)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC256(SECRET_KEY));
@@ -26,6 +27,10 @@ public class JwtService implements Serializable {
 
     public String extractEmail(String token) {
         return decodedToken(token).getSubject();
+    }
+
+    public String extractUsername(String token) {
+        return decodedToken(token).getClaim("username").asString();
     }
 
     public boolean isTokenExpired(String token) {

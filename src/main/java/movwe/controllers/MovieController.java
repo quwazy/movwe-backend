@@ -1,11 +1,13 @@
 package movwe.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import movwe.domains.movies.entities.Movie;
-import movwe.domains.movies.mappers.MovieMapper;
-import movwe.services.MovieService;
+import movwe.domains.movies.dtos.CreateMovieDto;
+import movwe.domains.movies.dtos.UpdateMovieDto;
+import movwe.services.moderatorServices.MovieService;
 import movwe.utils.interfaces.ControllerInterface;
-import movwe.utils.interfaces.DtoInterface;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,26 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @PreAuthorize("hasRole('ADMIN') or hasRole('EDITOR')")
 @RequestMapping("/api/movies")
-public class MovieController implements ControllerInterface {
+public class MovieController implements ControllerInterface<CreateMovieDto, UpdateMovieDto> {
     private final MovieService movieService;
 
     @Override
-    public ResponseEntity<?> getById(Long id) {
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         try {
-            Movie movie = movieService.getById(id);
-            if (movie != null) {
-                return ResponseEntity.ok(MovieMapper.INSTANCE.fromMovieToDto(movie));
-            }
-            return ResponseEntity.badRequest().body("Something went wrong with get movie by id " + id);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @Override
-    public ResponseEntity<?> getByEmail(String email) {
-        try {
-            return ResponseEntity.ok(movieService.getAllByEmail(email));
+            return ResponseEntity.ok(movieService.getById(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -48,8 +37,18 @@ public class MovieController implements ControllerInterface {
         }
     }
 
+    @Operation(summary = "Get all movies from user with id")
+    @GetMapping(path = "/getAllByUserId/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllByUserId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(movieService.getAllByUserId(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @Override
-    public ResponseEntity<?> create(DtoInterface dto) {
+    public ResponseEntity<?> create(@Valid @RequestBody CreateMovieDto dto) {
         try {
             if (movieService.create(dto) != null){
                 return ResponseEntity.ok().build();
@@ -61,8 +60,15 @@ public class MovieController implements ControllerInterface {
     }
 
     @Override
-    public ResponseEntity<?> update(DtoInterface dto) {
-        return null;
+    public ResponseEntity<?> update(UpdateMovieDto dto) {
+        try {
+            if (movieService.update(dto) != null){
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.badRequest().body("Something went wrong with updating movie");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @Override
@@ -77,14 +83,15 @@ public class MovieController implements ControllerInterface {
         }
     }
 
-    @Override
+    @Operation(summary = "Deleting all the movies from user with id")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteByEmail(String email) {
+    @DeleteMapping(path = "/deleteAllByUserId/{id}")
+    public ResponseEntity<?> deleteByEmail(@PathVariable Long id) {
         try {
-            if (movieService.deleteByEmail(email)){
+            if (movieService.deleteAllByUserId(id)){
                 return ResponseEntity.ok().build();
             }
-            return ResponseEntity.badRequest().body("Something went wrong with deleting movies from client with email " + email);
+            return ResponseEntity.badRequest().body("Something went wrong with deleting movies from user with id: " + id);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

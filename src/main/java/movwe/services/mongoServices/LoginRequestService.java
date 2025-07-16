@@ -1,7 +1,7 @@
 package movwe.services.mongoServices;
 
 import lombok.AllArgsConstructor;
-import movwe.domains.mongos.LoginRequest;
+import movwe.domains.mongoEntities.LoginRequest;
 import movwe.repositories.mongoRepositories.LoginRequestRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,15 @@ public class LoginRequestService {
         return loginRequestRepository.findByEmailAndRequestTimeAfterOrderByRequestTimeAsc(email, System.currentTimeMillis()/1000L - 60 * 60 * 24).orElse(null);
     }
 
-    public void create(LoginRequest loginRequest) {
+    public void create(String email, String password, String route, String ipAddress, boolean isSuccess) {
+        LoginRequest loginRequest = LoginRequest.builder()
+                .email(email)
+                .password(password)
+                .route(route)
+                .ipAddress(ipAddress)
+                .requestTime(System.currentTimeMillis()/1000L)
+                .successful(isSuccess)
+                .build();
         loginRequestRepository.save(loginRequest);
     }
 
