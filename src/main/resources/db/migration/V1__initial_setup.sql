@@ -67,9 +67,9 @@ CREATE TABLE login_requests (
     email VARCHAR(255),
     password VARCHAR(255),
     route VARCHAR(255),
-    ipAddress VARCHAR(255),
+    ip_address VARCHAR(255),
     successful BOOLEAN,
-    requestTime BIGINT
+    request_time BIGINT
 );
 
 -- Indexes
