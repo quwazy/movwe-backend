@@ -31,7 +31,7 @@ services:
 #      - movwe-network
 
   redis:
-    image: redis:8
+    image: redis:8-alpine
     container_name: redis
     restart: always
     ports:

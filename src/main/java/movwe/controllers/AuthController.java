@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import movwe.domains.users.dtos.CreateUserDto;
-import movwe.services.moderatorServices.LoginRequestService;
+import movwe.services.authServices.LoginRequestService;
 import movwe.services.moderatorServices.UserService;
 import movwe.services.authServices.JwtService;
 import movwe.utils.dtos.JwtDto;
