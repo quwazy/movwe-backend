@@ -25,12 +25,14 @@ public class UserService implements ServiceInterface<UserDto> {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getById(Long id) {
         return userRepository.findById(id)
                 .map(UserMapper.INSTANCE::fromUserToDto)
                 .orElseThrow(() -> new IdNotFoundException("User", id));
     }
 
+    @Transactional(readOnly = true)
     public UserDto getByEmail(String email) {
         return userRepository.findByEmail(email)
                 .map(UserMapper.INSTANCE::fromUserToDto)
@@ -38,6 +40,7 @@ public class UserService implements ServiceInterface<UserDto> {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getAll() {
         return userRepository.findAll()
                 .stream()
@@ -68,6 +71,7 @@ public class UserService implements ServiceInterface<UserDto> {
         return null;
     }
 
+    @CacheEvict(value = "userByEmail", allEntries = true)
     public UserDto updateActivity(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException("User", id));
         user.setActive(!user.isActive());
@@ -76,6 +80,7 @@ public class UserService implements ServiceInterface<UserDto> {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "userByEmail", allEntries = true)
     public boolean deleteById(Long id) {
         return userRepository.deleteByIdCustom(id) == 1;
     }

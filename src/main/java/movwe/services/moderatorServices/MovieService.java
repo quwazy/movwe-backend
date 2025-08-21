@@ -2,7 +2,6 @@ package movwe.services.moderatorServices;
 
 import lombok.AllArgsConstructor;
 import movwe.domains.movies.Movie;
-import movwe.domains.movies.dtos.CreateMovieDto;
 import movwe.domains.movies.dtos.ModeratorMovieDto;
 import movwe.domains.movies.MovieMapper;
 import movwe.domains.movies.dtos.UpdateMovieDto;
@@ -22,6 +21,7 @@ public class MovieService implements ServiceInterface<ModeratorMovieDto> {
     private final MovieRepository movieRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ModeratorMovieDto getById(Long id) {
         return movieRepository.findById(id)
                 .map(MovieMapper.INSTANCE::fromMovieToModeratorMovieDto)
@@ -29,6 +29,7 @@ public class MovieService implements ServiceInterface<ModeratorMovieDto> {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModeratorMovieDto> getAll() {
         return movieRepository.findAll()
                 .stream()
@@ -36,6 +37,7 @@ public class MovieService implements ServiceInterface<ModeratorMovieDto> {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ModeratorMovieDto> getAllByUserId(Long id) {
         return movieRepository.findAllByUser_IdOrderByCreationDateDesc(id)
                 .orElseGet(Collections::emptyList)

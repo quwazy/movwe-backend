@@ -26,6 +26,7 @@ public class ModeratorService implements ServiceInterface<ModeratorDto> {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public ModeratorDto getById(Long id) {
         return moderatorRepository.findByIdCustom(id)
                 .map(ModeratorMapper.INSTANCE::fromModeratorToDto)
@@ -33,6 +34,7 @@ public class ModeratorService implements ServiceInterface<ModeratorDto> {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModeratorDto> getAll() {
         return moderatorRepository.findAllCustom()
                 .orElseGet(Collections::emptyList)
@@ -65,6 +67,7 @@ public class ModeratorService implements ServiceInterface<ModeratorDto> {
         return null;
     }
 
+    @CacheEvict(value = "userByEmail", allEntries = true)
     public ModeratorDto updateActivity(Long id) {
         Moderator moderator = moderatorRepository.findByIdCustom(id).orElseThrow(() -> new IdNotFoundException("Moderator", id));
         moderator.setActive(!moderator.isActive());
@@ -73,6 +76,7 @@ public class ModeratorService implements ServiceInterface<ModeratorDto> {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "userByEmail", allEntries = true)
     public boolean deleteById(Long id) {
         return moderatorRepository.deleteByIdCustom(id) == 1;
     }
