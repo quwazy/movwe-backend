@@ -47,14 +47,10 @@ public class AuthController {
     @Operation(summary = "Sign in user")
     @PostMapping(path = "/createUser", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDto createUserDto) {
-        try {
-            if (userService.create(createUserDto) != null) {
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.badRequest().body("Something went wrong with adding user");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        if (userService.create(createUserDto) != null) {
+            return ResponseEntity.ok().build();
         }
+        return ResponseEntity.badRequest().body("Something went wrong with adding user");
     }
 
     /**
