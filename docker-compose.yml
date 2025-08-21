@@ -15,20 +15,20 @@ services:
     networks:
       - movwe-network
 
-  mongo:
-    image: mongo:8
-    container_name: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: movwe
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - movwe-network
+#  mongo:
+#    image: mongo:8
+#    container_name: mongo
+#    restart: always
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: root
+#      MONGO_INITDB_DATABASE: movwe
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongo-data:/data/db
+#    networks:
+#      - movwe-network
 
   redis:
     image: redis:8
@@ -53,7 +53,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
 
       #MongoDB
-      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/movwe?authSource=admin
+#      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/movwe?authSource=admin
 
       #Redis
       SPRING_CACHE_TYPE: redis
@@ -63,14 +63,14 @@ services:
 
     depends_on:
       - postgres
-      - mongo
+#      - mongo
       - redis
     networks:
       - movwe-network
 
 volumes:
   postgres-data:
-  mongo-data:
+#  mongo-data:
 
 networks:
   movwe-network:

@@ -1,8 +1,8 @@
-package movwe.services.mongoServices;
+package movwe.services.moderatorServices;
 
 import lombok.AllArgsConstructor;
-import movwe.domains.mongoEntities.LoginRequest;
-import movwe.repositories.mongoRepositories.LoginRequestRepository;
+import movwe.domains.logins.LoginRequest;
+import movwe.repositories.LoginRequestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +13,11 @@ public class LoginRequestService {
     private final LoginRequestRepository loginRequestRepository;
 
     public List<LoginRequest> getAllByEmail(String email) {
-        return loginRequestRepository.findAllByEmail(email).orElse(null);
+        return loginRequestRepository.findAllByEmail(email).stream().toList();
     }
 
     public List<LoginRequest> getByEmailInLastDay(String email) {
-        return loginRequestRepository.findByEmailAndRequestTimeAfterOrderByRequestTimeAsc(email, System.currentTimeMillis()/1000L - 60 * 60 * 24).orElse(null);
+        return loginRequestRepository.findByEmailAndRequestTimeAfterOrderByRequestTimeAsc(email, System.currentTimeMillis()/1000L - 60 * 60 * 24).stream().toList();
     }
 
     public void create(String email, String password, String route, String ipAddress, boolean isSuccess) {
@@ -29,7 +29,7 @@ public class LoginRequestService {
                 .requestTime(System.currentTimeMillis()/1000L)
                 .successful(isSuccess)
                 .build();
-        loginRequestRepository.save(loginRequest);
+        loginRequestRepository.saveAndFlush(loginRequest);
     }
 
     public void deleteAll() {

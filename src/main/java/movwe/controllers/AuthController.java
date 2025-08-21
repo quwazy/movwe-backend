@@ -5,9 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import movwe.domains.users.dtos.CreateUserDto;
+import movwe.services.moderatorServices.LoginRequestService;
 import movwe.services.moderatorServices.UserService;
 import movwe.services.authServices.JwtService;
-import movwe.services.mongoServices.LoginRequestService;
 import movwe.utils.dtos.JwtDto;
 import movwe.utils.dtos.LoginDto;
 import org.springframework.http.MediaType;
@@ -89,8 +89,7 @@ public class AuthController {
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         } else {
-            // X-Forwarded-For might contain a list of IPs: client, proxy1, proxy2
-            ip = ip.split(",")[0].trim();
+            ip = ip.split(",")[0].trim(); // X-Forwarded-For might contain a list of IPs: client, proxy1, proxy2
         }
         return ip;
     }

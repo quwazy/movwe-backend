@@ -1,26 +1,38 @@
-package movwe.domains.mongoEntities;
+package movwe.domains.logins;
 
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
+@Entity
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "login_requests")
+@AllArgsConstructor
+@Builder
+@Table(name = "login_requests")
 public class LoginRequest implements Serializable {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String email;
+
     private String password;
+
     private String route;
+
     private String ipAddress;
+
     private boolean successful;
+
     private Long requestTime = System.currentTimeMillis() / 1000L;
+
+    @PrePersist
+    public void prePersist() {
+        this.requestTime = System.currentTimeMillis() / 1000L;
+    }
 }
