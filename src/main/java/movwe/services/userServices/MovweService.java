@@ -11,6 +11,9 @@ import movwe.repositories.MovieRepository;
 import movwe.repositories.UserRepository;
 import movwe.utils.exceptions.IdNotFoundException;
 import movwe.utils.exceptions.UsernameNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +27,14 @@ public class MovweService {
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "userMovies", key = "#username")
     public List<UserMovieDto> getUserMovies(String username) {
         return getAllMoviesFromUser(username);
     }
 
+    @CacheEvict(value = "userMovies", key = "#username")
+    @CachePut(value = "userMovies", key = "#username")
     public List<UserMovieDto> addUserMovie(String username, CreateMovieDto createMovieDto) {
         Movie movie = MovieMapper.INSTANCE.fromCreateDtoToMovie(createMovieDto);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " not found!"));
@@ -40,6 +47,8 @@ public class MovweService {
         return getAllMoviesFromUser(username);
     }
 
+    @CacheEvict(value = "userMovies", key = "#username")
+    @CachePut(value = "userMovies", key = "#username")
     public List<UserMovieDto> updateUserMovie(String username, UpdateMovieDto updateMovieDto) {
         Movie movie = movieRepository.findById(updateMovieDto.getId()).orElseThrow(() -> new IdNotFoundException("Movie", updateMovieDto.getId()));
         if (movie == null || !movie.getUser().getUsername().equals(username)) {
@@ -52,6 +61,8 @@ public class MovweService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "userMovies", key = "#username")
+    @CachePut(value = "userMovies", key = "#username")
     public List<UserMovieDto> deleteUserMovie(String username, Long id) {
         if (movieRepository.deleteByIdAndUser_Username(id, username) == 1){
             return getAllMoviesFromUser(username);
