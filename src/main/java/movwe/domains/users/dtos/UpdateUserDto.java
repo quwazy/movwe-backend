@@ -14,6 +14,7 @@ import movwe.utils.interfaces.DtoInterface;
 public class UpdateUserDto implements DtoInterface {
     @NotNull(message = "Id is required")
     private Long id;
+    private String username;
     @Email
     private String email;
     private String password;
