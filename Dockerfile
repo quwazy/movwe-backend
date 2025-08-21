@@ -1,39 +1,34 @@
-# Ovo je multi-stage Docker build: https://docs.docker.com/build/building/multi-stage/
-# Multi-stage build nam omogucava da koristimo jedan image koji ima sve alate
-# da buildujemo aplikaciju, a drugi image kao osnovu za kranji image koji buildujemo.
-#
-# U prvom stage-u koristimo Maven image koji dolazi sa mavenom i Javom 17.
-# Tu buildujemo aplikaciju i pravimo .jar fajl.
-# U drugom stage-u koristimo OpenJDK image koji ima samo Javu sto nam je
-# dovoljno da pokrenemo aplikaciju.
-#
-# Ovo je univerzalni Dockerfile koji moze da se koristi za sve Java/Spring mikroservise.
+# ---- Build stage ----
+# syntax=docker/dockerfile:1.7
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+WORKDIR /app
 
-FROM maven:3.9.9 AS builder
+# Prime dependency cache first for faster rebuilds
+COPY pom.xml .
+RUN --mount=type=cache,target=/root/.m2 mvn -q -DskipTests dependency:go-offline
 
-# Ovaj deo definise HOME direktorijum koji se koristi kao radni direktorijum prilikom buildovanja.
-ENV HOME=/usr/app
-RUN mkdir -p $HOME
-WORKDIR $HOME
+# Build the fat jar
+COPY src ./src
+RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -DskipTests clean package spring-boot:repackage
 
-# Ovaj deo kopira mikroservis u image kako bi Maven mogao da builduje taj mikroservis.
-ADD . $HOME
+# Extract Spring Boot layers
+RUN java -Djarmode=layertools -jar target/*.jar extract --destination /layers
 
-# Ovaj deo builduje .jar fajl.
-# - "--mount=type=cache,target=/root/.m2" sluzi da kesira maven dependencies
-#   kako ih ne bi iznova i iznova preuzimali prilikom svakog buildovanja image-a
-# - "-Drevision=$VERSION" - prosledjuje verziju koju smo definisali gore, ignorisati
-# - "-Dmaven.test.skip" - iskljucuje pokretanje testova prilikom buildovanja image-a
-# - "-f $HOME/pom.xml" - putanja do pom.xml fajla
-RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -Dmaven.test.skip -f $HOME/pom.xml clean package
 
-# Final stage
-FROM alpine:latest
+# ---- Runtime stage ----
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /opt/app
 
-RUN apk add --no-cache openjdk21-jre
+# Create non-root user
+RUN addgroup -S app && adduser -S app -G app
+USER app
 
-COPY --from=builder /usr/app/target/movwe-0.0.1.jar /movwe-0.0.1.jar
+# Copy layers separately to maximize Docker cache reuse
+COPY --from=builder /layers/dependencies/ ./
+COPY --from=builder /layers/spring-boot-loader/ ./
+COPY --from=builder /layers/snapshot-dependencies/ ./
+COPY --from=builder /layers/application/ ./
 
+# Run the application on port 9999
 EXPOSE 9999
-
-ENTRYPOINT ["java", "-jar", "/movwe-0.0.1.jar"]
+ENTRYPOINT ["java","org.springframework.boot.loader.launch.JarLauncher"]
