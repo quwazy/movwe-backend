@@ -14,10 +14,9 @@ RUN --mount=type=cache,target=/root/.m2 mvn -DfinalName=app -DskipTests clean pa
 # Extract Spring Boot layers
 RUN java -Djarmode=layertools -jar target/*.jar extract --destination /layers
 
-
 # ---- Runtime stage ----
 FROM eclipse-temurin:21-jre-alpine
-WORKDIR /opt/app
+WORKDIR /app
 
 # Create non-root user
 RUN addgroup -S app && adduser -S app -G app
