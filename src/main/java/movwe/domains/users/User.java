@@ -1,35 +1,55 @@
 package movwe.domains.users;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import movwe.domains.movies.Movie;
+import movwe.domains.person.Person;
+import movwe.domains.users.entities.Address;
+import movwe.domains.users.entities.Info;
 
-import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class User implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @NotBlank
-    @Email(message = "Invalid email format")
+@EqualsAndHashCode(callSuper = true)
+@Table(name = "users")
+public class User extends Person {
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
-    private String password;
+    @Embedded
+    private Info info;
 
-    private Long creationDate;
+    @Embedded
+    private Address address;
 
-    @PrePersist
-    public void prePersist() {
-        this.creationDate = System.currentTimeMillis() / 1000L;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Movie> movieList = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private Set<User> friendList = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(this.getId(), user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

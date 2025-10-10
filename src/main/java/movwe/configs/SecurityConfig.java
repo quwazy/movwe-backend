@@ -32,9 +32,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/*.html", "/css/**", "/js/**", "/images/**").permitAll()  //static HTML
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()               //swagger
-                        .requestMatchers("/auth/**").permitAll()                        //login and sign in
-                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()     //allows OPTIONS header for all routes
-                        .anyRequest().authenticated()                                     //for everything else, you must be authenticated
+                        .requestMatchers("/auth/**").permitAll()                                          //login and sign-in routes
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()                       //allows OPTIONS header for all routes
+                        .anyRequest().authenticated()                                                       //for everything else, you must be authenticated
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(JwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

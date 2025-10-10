@@ -56,7 +56,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 logger.warn("JWT token is missing in request header");
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }

@@ -1,103 +1,100 @@
 package movwe.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import movwe.domains.clients.dtos.FriendDto;
+import movwe.domains.movies.dtos.UpdateMovieDto;
+import movwe.domains.movies.dtos.UserMovieDto;
+import movwe.domains.users.dtos.FriendDto;
 import movwe.domains.movies.dtos.CreateMovieDto;
-import movwe.services.FriendService;
-import movwe.services.MovieService;
+import movwe.services.userServices.FriendService;
 import movwe.services.authServices.JwtService;
+import movwe.services.userServices.MovweService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/movwe")
 public class MovweController {
     private final JwtService jwtService;
-    private final MovieService movieService;
+    private final MovweService movweService;
     private final FriendService friendService;
 
-    @Operation(summary = "Get all movies from client's list")
-    @GetMapping(path = "/getAllMovies", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllMovies(@RequestHeader("Authorization") String token) {
-        try {
-            return ResponseEntity.ok(movieService.getAllMoviesFromClient(extractEmailFromJwt(token)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @Operation(summary = "Search for users")
+    @GetMapping(path = "/searchUsers", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<FriendDto>> searchUsers(@RequestHeader("Authorization") String token, @Valid @RequestBody FriendDto friendDto){
+        return ResponseEntity.ok(friendService.searchUsers(extractUsernameFromJwt(token), friendDto.getUsername()));
     }
 
-    @Operation(summary = "Add new movie on client's list")
-    @PostMapping(path = "/addMovie", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String token, @RequestBody CreateMovieDto createMovieDto) {
-        try {
-            createMovieDto.setEmail(extractEmailFromJwt(token));
-            if (movieService.create(createMovieDto) != null) {
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.badRequest().body("Something went wrong with adding movie to client's list");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @Operation(summary = "Get all movies from user")
+    @GetMapping(path = "/getUserMovies", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserMovieDto>> getUserMovies(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(movweService.getUserMovies(extractUsernameFromJwt(token)));
     }
 
-    @Operation(summary = "Delete movie from client's list")
-    @DeleteMapping(path = "/deleteMovie/{id}")
-    public ResponseEntity<?> deleteMovie(@RequestHeader("Authorization") String token, @PathVariable Long id){
-        try {
-            if (movieService.deleteClientMovies(id, extractEmailFromJwt(token))){
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.badRequest().body("Something went wrong with deleting movie from client's list");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @Operation(summary = "Get all movies from other user")
+    @GetMapping(path = "/getOtherUserMovies", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserMovieDto>> getOtherUserMovies(@RequestHeader("Authorization") String token, @Valid @RequestBody FriendDto friendDto) {
+        return ResponseEntity.ok(movweService.getUserMovies(friendDto.getUsername()));
     }
 
-    @Operation(summary = "List all friends from friend list")
+    @Operation(summary = "List of friends from user")
     @GetMapping(path = "/getFriendList", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getFriendList(@RequestHeader("Authorization") String token) {
-        try {
-            return ResponseEntity.ok(friendService.getFriendList(extractEmailFromJwt(token)));
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<List<FriendDto>> getFriendList(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(friendService.getFriendList(extractUsernameFromJwt(token)));
     }
 
-    @Operation(summary = "Add friend on friend list")
+    @Operation(summary = "Add user to friend list")
     @PostMapping(path = "/addFriend", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
-        try {
-            if (!friendService.addFriend(extractEmailFromJwt(token), friendDto.getUsername()).isEmpty()){
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.badRequest().body("Something went wrong with adding friend to friend list");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<?> addFriend(@RequestHeader("Authorization") String token, @Valid @RequestBody FriendDto friendDto){
+        if (friendService.addFriendToFriendList(extractUsernameFromJwt(token), friendDto.getUsername()) != null){
+            return ResponseEntity.ok().build();
         }
+        return ResponseEntity.badRequest().body("Something went wrong with adding friend to friend list");
     }
 
-    @Operation(summary = "Remove friend from friend list")
+    @Operation(summary = "Add new movie for user")
+    @PostMapping(path = "/addMovie", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String token, @Valid @RequestBody CreateMovieDto createMovieDto) {
+        if (movweService.addUserMovie(extractUsernameFromJwt(token), createMovieDto) != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body("Something went wrong with adding new movie");
+    }
+
+    @Operation(summary = "Update existing movie")
+    @PutMapping(path = "/updateMovie", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateMovie(@RequestHeader("Authorization") String token, @Valid @RequestBody UpdateMovieDto updateMovieDto) {
+        if (movweService.updateUserMovie(extractUsernameFromJwt(token), updateMovieDto) != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body("Something went wrong with updating existing movie");
+    }
+
+    @Operation(summary = "Remove user from friend list")
     @DeleteMapping(path = "/removeFriend", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendDto friendDto){
-        try {
-            if (friendService.removeFriend(extractEmailFromJwt(token),friendDto.getUsername())){
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.badRequest().body("Something went wrong with removing friend from friend list");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+        if (friendService.removeFriendFromFriendList(extractUsernameFromJwt(token),friendDto.getUsername()) != null){
+            return ResponseEntity.ok().build();
         }
+        return ResponseEntity.badRequest().body("Something went wrong with removing friend from friend list");
     }
 
-    /**
-     * Extract email from jwt token
-     * @param jwt token
-     * @return email from jwt as String
-     */
-    private String extractEmailFromJwt(String jwt) {
-        return jwtService.extractEmail(jwt.substring(7));
+    @Operation(summary = "Delete movie from user's list")
+    @DeleteMapping(path = "/deleteMovie/{id}")
+    public ResponseEntity<?> deleteMovie(@RequestHeader("Authorization") String token, @PathVariable Long id){
+        if (movweService.deleteUserMovie(extractUsernameFromJwt(token), id) != null){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body("Something went wrong with deleting movie");
+    }
+
+    /* Extract username from jwt token */
+    private String extractUsernameFromJwt(String jwt) {
+        return jwtService.extractUsername(jwt.substring(7));
     }
 }
